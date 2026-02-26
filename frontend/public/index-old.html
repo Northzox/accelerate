@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ValandWaffen</title>
+    <meta name="description" content="Elite Community Platform">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="icon" href="/favicon.ico">
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        /* Dark theme */
+        body {
+            background: #000000;
+            color: #ffffff;
+        }
+        
+        /* Bullet sparkles background animation */
+        .sparkles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .sparkle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 3s linear infinite;
+        }
+        
+        @keyframes sparkle {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        /* Custom dark inputs */
+        .input-dark {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .input-dark:focus {
+            outline: none;
+            border-color: #333333;
+            background: #0f0f0f;
+        }
+        
+        .input-dark::placeholder {
+            color: #666666;
+        }
+        
+        /* Dark buttons */
+        .btn-dark {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .btn-dark:hover {
+            background: #1a1a1a;
+            border-color: #333333;
+        }
+        
+        .btn-primary-dark {
+            background: #0a0a0a;
+            border: 1px solid #ffffff;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .btn-primary-dark:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+        
+        /* Dark cards */
+        .card-dark {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        /* Navigation */
+        .nav-dark {
+            background: #0a0a0a;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .nav-link {
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: #1a1a1a;
+        }
+        
+        .nav-link.active {
+            background: #1a1a1a;
+        }
+        
+        /* Content container */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen" x-data="valandWaffenApp()">
+    
+    <!-- Bullet Sparkles Background -->
+    <div class="sparkles" id="sparkles"></div>
+    
+    <!-- Navigation -->
+    <header class="nav-dark sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <img src="/icons/main.png" alt="ValandWaffen" class="h-8 w-8 rounded-lg">
+                    <span class="text-xl font-bold text-white">ValandWaffen</span>
+                </div>
+                
+                <nav class="hidden md:flex space-x-1">
+                    <button @click="currentView = 'forum'" class="nav-link" :class="currentView === 'forum' ? 'active' : ''">
+                        💬 Forum
+                    </button>
+                    <button @click="currentView = 'chat'" class="nav-link" :class="currentView === 'chat' ? 'active' : ''">
+                        💭 Chat
+                    </button>
+                    <template x-if="isAuthenticated">
+                        <button @click="currentView = 'tickets'" class="nav-link" :class="currentView === 'tickets' ? 'active' : ''">
+                            🎫 Tickets
+                        </button>
+                        <button @click="currentView = 'profile'" class="nav-link" :class="currentView === 'profile' ? 'active' : ''">
+                            👤 Profile
+                        </button>
+                    </template>
+                </nav>
+
+                <div class="flex items-center space-x-4">
+                    <template x-if="!isAuthenticated">
+                        <button @click="showLoginModal = true" class="btn-primary-dark">
+                            Sign In
+                        </button>
+                    </template>
+                    
+                    <template x-if="isAuthenticated">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-right hidden lg:block">
+                                <div class="text-sm font-medium text-white" x-text="currentUser.username"></div>
+                                <div class="text-xs text-gray-400">
+                                    <span x-text="currentUser.role"></span> • Level <span x-text="currentUser.level"></span>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <button @click="showUserMenu = !showUserMenu" class="flex items-center space-x-2 text-sm rounded-full">
+                                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center">
+                                        <span class="text-white text-sm font-medium" x-text="currentUser.username.charAt(0).toUpperCase()"></span>
+                                    </div>
+                                </button>
+                                
+                                <div x-show="showUserMenu" x-cloak 
+                                     @click.away="showUserMenu = false"
+                                     class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-black border border-gray-800">
+                                    <div class="py-1">
+                                        <button @click="currentView = 'profile'; showUserMenu = false" class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-900">
+                                            👤 Profile
+                                        </button>
+                                        <button @click="logout(); showUserMenu = false" class="block w-full text-left px-4 py-2 text-sm text-gray-400 hover:bg-gray-900">
+                                            🚪 Sign Out
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-wrapper min-h-screen">
+        <!-- Forum View (Default) -->
+        <div x-show="currentView === 'forum' || currentView === 'home'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Forum</h2>
+                <template x-if="isAuthenticated">
+                    <button @click="showNewThreadModal = true" class="btn-primary-dark">
+                        ➕ New Thread
+                    </button>
+                </template>
+                <template x-if="!isAuthenticated">
+                    <button @click="showLoginModal = true" class="btn-primary-dark">
+                        ➕ Sign in to create thread
+                    </button>
+                </template>
+            </div>
+
+            <div class="space-y-4">
+                <template x-for="thread in forumThreads" :key="thread.id">
+                    <div class="card-dark hover:bg-gray-900 cursor-pointer transition-all" @click="viewThread(thread)">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-white mb-2" x-text="thread.title"></h3>
+                                <p class="text-gray-400 text-sm mb-3" x-text="thread.content.substring(0, 200) + '...'"></p>
+                                <div class="flex items-center space-x-6 text-xs text-gray-500">
+                                    <span>👤 <span x-text="thread.author"></span></span>
+                                    <span>💬 <span x-text="thread.replies.length"></span> replies</span>
+                                    <span>👁️ <span x-text="thread.views"></span> views</span>
+                                    <span x-text="formatDate(thread.createdAt)"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Chat View -->
+        <div x-show="currentView === 'chat'" x-cloak class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="card-dark">
+                <div class="border-b border-gray-800 pb-4 mb-4">
+                    <h2 class="text-2xl font-bold text-white">💬 Global Chat</h2>
+                    <p class="text-gray-400 text-sm">Real-time community chat</p>
+                </div>
+
+                <div class="h-96 overflow-y-auto mb-4 space-y-3" id="chatMessages">
+                    <template x-for="message in chatMessages" :key="message.id">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-medium" x-text="message.author.charAt(0).toUpperCase()"></span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="text-sm font-medium text-white" x-text="message.author"></span>
+                                    <span class="text-xs text-gray-500" x-text="formatDate(message.timestamp)"></span>
+                                </div>
+                                <p class="text-gray-300 text-sm" x-text="message.content"></p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <template x-if="isAuthenticated">
+                    <div class="flex space-x-2">
+                        <input x-model="newChatMessage" @keyup.enter="sendChatMessage" 
+                               type="text" placeholder="Type your message..." 
+                               class="input-dark flex-1">
+                        <button @click="sendChatMessage" class="btn-primary-dark">Send</button>
+                    </div>
+                </template>
+                <template x-if="!isAuthenticated">
+                    <div class="text-center py-4">
+                        <button @click="showLoginModal = true" class="btn-primary-dark">Sign in to chat</button>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Tickets View -->
+        <div x-show="currentView === 'tickets'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">🎫 Recruitment Tickets</h2>
+                <button @click="showNewTicketModal = true" class="btn-primary-dark">
+                    ➕ Open Ticket
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <template x-for="ticket in userTickets" :key="ticket.id">
+                    <div class="card-dark">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-white mb-2" x-text="ticket.title"></h3>
+                                <p class="text-gray-400 text-sm mb-3" x-text="ticket.messages[0]?.content"></p>
+                                <div class="flex items-center space-x-6 text-xs text-gray-500">
+                                    <span>📁 <span x-text="ticket.category"></span></span>
+                                    <span>📊 <span class="px-2 py-1 rounded-full" 
+                                           :class="ticket.status === 'open' ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'" 
+                                           x-text="ticket.status"></span>
+                                    <span x-text="formatDate(ticket.createdAt)"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Profile View -->
+        <div x-show="currentView === 'profile'" x-cloak class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="card-dark">
+                <h2 class="text-2xl font-bold text-white mb-6">👤 Profile</h2>
+                
+                <div class="flex items-center space-x-6 mb-6">
+                    <div class="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center">
+                        <span class="text-white text-2xl font-medium" x-text="currentUser.username.charAt(0).toUpperCase()"></span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-white" x-text="currentUser.username"></h3>
+                        <p class="text-sm text-gray-400">
+                            <span x-text="currentUser.role"></span> • Level <span x-text="currentUser.level"></span>
+                        </p>
+                        <p class="text-sm text-gray-500"><span x-text="currentUser.xp"></span> XP</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center p-4 bg-gray-900 rounded-lg">
+                        <div class="text-2xl font-bold text-white" x-text="currentUser.level"></div>
+                        <div class="text-sm text-gray-400">Level</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-900 rounded-lg">
+                        <div class="text-2xl font-bold text-white" x-text="currentUser.xp"></div>
+                        <div class="text-sm text-gray-400">Total XP</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-900 rounded-lg">
+                        <div class="text-2xl font-bold text-white" x-text="forumThreads.filter(t => t.author === currentUser.username).length"></div>
+                        <div class="text-sm text-gray-400">Threads Created</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div x-show="showLoginModal" x-cloak class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" @click.self="showLoginModal = false">
+        <div class="card-dark max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Sign In</h3>
+            <form @submit.prevent="login">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                        <input x-model="loginForm.email" type="email" required class="input-dark">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                        <input x-model="loginForm.password" type="password" required class="input-dark">
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="btn-primary-dark flex-1">Sign In</button>
+                    <button type="button" @click="showLoginModal = false" class="btn-dark flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Thread Modal -->
+    <div x-show="showNewThreadModal" x-cloak class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" @click.self="showNewThreadModal = false">
+        <div class="card-dark max-w-2xl w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Create New Thread</h3>
+            <form @submit.prevent="createThread">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Title</label>
+                        <input x-model="newThread.title" type="text" required class="input-dark">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Content</label>
+                        <textarea x-model="newThread.content" rows="6" required class="input-dark"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="btn-primary-dark flex-1">Create Thread</button>
+                    <button type="button" @click="showNewThreadModal = false" class="btn-dark flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Ticket Modal -->
+    <div x-show="showNewTicketModal" x-cloak class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" @click.self="showNewTicketModal = false">
+        <div class="card-dark max-w-2xl w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Open Recruitment Ticket</h3>
+            <form @submit.prevent="createTicket">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Title</label>
+                        <input x-model="newTicket.title" type="text" required class="input-dark">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                        <select x-model="newTicket.category" class="input-dark">
+                            <option value="recruitment">Recruitment</option>
+                            <option value="support">Support</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Message</label>
+                        <textarea x-model="newTicket.content" rows="6" required class="input-dark"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="btn-primary-dark flex-1">Open Ticket</button>
+                    <button type="button" @click="showNewTicketModal = false" class="btn-dark flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function valandWaffenApp() {
+            return {
+                currentView: 'forum',
+                isAuthenticated: false,
+                currentUser: null,
+                showLoginModal: false,
+                showNewThreadModal: false,
+                showNewTicketModal: false,
+                showUserMenu: false,
+                loginForm: { email: '', password: '' },
+                newThread: { title: '', content: '' },
+                newTicket: { title: '', category: 'recruitment', content: '' },
+                newChatMessage: '',
+                forumThreads: [],
+                chatMessages: [],
+                userTickets: [],
+
+                init() {
+                    this.loadData();
+                    this.checkAuth();
+                    this.initializeSampleData();
+                    this.createSparkles();
+                },
+
+                createSparkles() {
+                    const sparklesContainer = document.getElementById('sparkles');
+                    setInterval(() => {
+                        if (sparklesContainer.children.length < 15) {
+                            const sparkle = document.createElement('div');
+                            sparkle.className = 'sparkle';
+                            sparkle.style.left = Math.random() * 100 + '%';
+                            sparkle.style.width = sparkle.style.height = Math.random() * 3 + 1 + 'px';
+                            sparkle.style.animationDelay = Math.random() * 3 + 's';
+                            sparkle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                            sparklesContainer.appendChild(sparkle);
+                            
+                            setTimeout(() => sparkle.remove(), 5000);
+                        }
+                    }, 300);
+                },
+
+                loadData() {
+                    const savedData = localStorage.getItem('valandwaffen_data');
+                    if (savedData) {
+                        const data = JSON.parse(savedData);
+                        this.forumThreads = data.forumThreads || [];
+                        this.chatMessages = data.chatMessages || [];
+                        this.userTickets = data.userTickets || [];
+                    }
+                },
+
+                saveData() {
+                    const data = {
+                        forumThreads: this.forumThreads,
+                        chatMessages: this.chatMessages,
+                        userTickets: this.userTickets
+                    };
+                    localStorage.setItem('valandwaffen_data', JSON.stringify(data));
+                },
+
+                checkAuth() {
+                    const savedUser = localStorage.getItem('valandwaffen_user');
+                    if (savedUser) {
+                        this.currentUser = JSON.parse(savedUser);
+                        this.isAuthenticated = true;
+                    }
+                },
+
+                login() {
+                    const hashPassword = (password) => btoa(password + 'salt');
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    
+                    const user = users.find(u => 
+                        u.email === this.loginForm.email && 
+                        u.password === hashPassword(this.loginForm.password)
+                    );
+
+                    if (user) {
+                        this.currentUser = user;
+                        this.isAuthenticated = true;
+                        localStorage.setItem('valandwaffen_user', JSON.stringify(user));
+                        this.showLoginModal = false;
+                        this.loginForm = { email: '', password: '' };
+                    } else {
+                        alert('Invalid credentials!');
+                    }
+                },
+
+                logout() {
+                    this.currentUser = null;
+                    this.isAuthenticated = false;
+                    localStorage.removeItem('valandwaffen_user');
+                    this.currentView = 'forum';
+                },
+
+                createThread() {
+                    const thread = {
+                        id: Date.now(),
+                        title: this.newThread.title,
+                        content: this.newThread.content,
+                        author: this.currentUser.username,
+                        replies: [],
+                        views: 0,
+                        createdAt: new Date().toISOString()
+                    };
+
+                    this.forumThreads.unshift(thread);
+                    this.saveData();
+                    this.showNewThreadModal = false;
+                    this.newThread = { title: '', content: '' };
+                    
+                    this.addXP(25, 'thread_created');
+                },
+
+                createTicket() {
+                    const ticket = {
+                        id: Date.now(),
+                        title: this.newTicket.title,
+                        category: this.newTicket.category,
+                        status: 'open',
+                        createdBy: this.currentUser.username,
+                        messages: [{
+                            content: this.newTicket.content,
+                            author: this.currentUser.username,
+                            timestamp: new Date().toISOString()
+                        }],
+                        createdAt: new Date().toISOString()
+                    };
+
+                    this.userTickets.unshift(ticket);
+                    this.saveData();
+                    this.showNewTicketModal = false;
+                    this.newTicket = { title: '', category: 'recruitment', content: '' };
+                    
+                    this.addXP(15);
+                },
+
+                sendChatMessage() {
+                    if (!this.newChatMessage.trim()) return;
+
+                    const message = {
+                        id: Date.now(),
+                        author: this.currentUser.username,
+                        content: this.newChatMessage,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    this.chatMessages.push(message);
+                    this.saveData();
+                    this.newChatMessage = '';
+                    
+                    if (this.chatMessages.length > 50) {
+                        this.chatMessages = this.chatMessages.slice(-50);
+                    }
+                    
+                    this.addXP(2, 'chat_message');
+                },
+
+                addXP(amount, type = 'general') {
+                    if (!this.currentUser) return;
+                    
+                    // Check daily limits
+                    const today = new Date().toDateString();
+                    const dailyXP = this.currentUser.dailyXP || {};
+                    if (!dailyXP[today]) dailyXP[today] = 0;
+                    
+                    let xpGained = amount;
+                    
+                    // Apply daily limits
+                    if (type === 'chat_message' && dailyXP[today] >= 50) {
+                        xpGained = 0; // Max 50 XP per day from chat
+                    } else if (type === 'thread_created' && dailyXP[today] >= 100) {
+                        xpGained = 5; // Reduced XP after daily limit
+                    }
+                    
+                    if (xpGained > 0) {
+                        this.currentUser.xp += xpGained;
+                        dailyXP[today] += xpGained;
+                        this.currentUser.dailyXP = dailyXP;
+                    }
+                    
+                    // Calculate level
+                    const xp = this.currentUser.xp;
+                    let level = 1;
+                    if (xp >= 15000) level = 15;
+                    else if (xp >= 12000) level = 14;
+                    else if (xp >= 10000) level = 13;
+                    else if (xp >= 8500) level = 12;
+                    else if (xp >= 7000) level = 11;
+                    else if (xp >= 5500) level = 10;
+                    else if (xp >= 4200) level = 9;
+                    else if (xp >= 3100) level = 8;
+                    else if (xp >= 2200) level = 7;
+                    else if (xp >= 1450) level = 6;
+                    else if (xp >= 900) level = 5;
+                    else if (xp >= 500) level = 4;
+                    else if (xp >= 200) level = 3;
+                    else if (xp >= 50) level = 2;
+                    
+                    this.currentUser.level = level;
+                    
+                    // Update users array
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === this.currentUser.id);
+                    if (userIndex !== -1) {
+                        users[userIndex].xp = this.currentUser.xp;
+                        users[userIndex].level = this.currentUser.level;
+                        users[userIndex].dailyXP = this.currentUser.dailyXP;
+                        localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                    }
+                    
+                    localStorage.setItem('valandwaffen_user', JSON.stringify(this.currentUser));
+                },
+
+                viewThread(thread) {
+                    thread.views++;
+                    this.saveData();
+                    alert(`Thread: ${thread.title}\n\n${thread.content}\n\nReplies: ${thread.replies.length}\nViews: ${thread.views}`);
+                },
+
+                formatDate(dateString) {
+                    const date = new Date(dateString);
+                    const now = new Date();
+                    const diff = Math.floor((now - date) / 1000);
+                    
+                    if (diff < 60) return 'just now';
+                    if (diff < 3600) return Math.floor(diff / 60) + ' minutes ago';
+                    if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+                    return Math.floor(diff / 86400) + ' days ago';
+                },
+
+                initializeSampleData() {
+                    // Create admin user
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const adminExists = users.find(u => u.email === 'northlable69@gmail.com');
+                    
+                    if (!adminExists) {
+                        const adminUser = {
+                            id: 1,
+                            username: 'skandal',
+                            email: 'northlable69@gmail.com',
+                            password: btoa('67north67' + 'salt'),
+                            role: 'Admin',
+                            badges: ['Admin'],
+                            xp: 1000,
+                            level: 3,
+                            createdAt: new Date().toISOString()
+                        };
+                        users.push(adminUser);
+                        localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                    }
+
+                    // Add sample forum threads
+                    if (this.forumThreads.length === 0) {
+                        this.forumThreads = [
+                            {
+                                id: 1,
+                                title: 'Community Guidelines',
+                                content: 'Welcome to ValandWaffen. Please follow our community guidelines and maintain respect for all members.',
+                                author: 'skandal',
+                                replies: [],
+                                views: 45,
+                                createdAt: new Date(Date.now() - 86400000).toISOString()
+                            },
+                            {
+                                id: 2,
+                                title: 'General Discussion',
+                                content: 'This is a general discussion thread for community members to connect and share ideas.',
+                                author: 'skandal',
+                                replies: [],
+                                views: 23,
+                                createdAt: new Date(Date.now() - 172800000).toISOString()
+                            }
+                        ];
+                        this.saveData();
+                    }
+
+                    // Add sample chat messages
+                    if (this.chatMessages.length === 0) {
+                        this.chatMessages = [
+                            {
+                                id: 1,
+                                author: 'skandal',
+                                content: 'Welcome to the community chat.',
+                                timestamp: new Date(Date.now() - 3600000).toISOString()
+                            }
+                        ];
+                        this.saveData();
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+                
+                <nav class="hidden md:flex space-x-1">
+                    <template x-if="isAuthenticated">
+                        <div class="flex space-x-1">
+                            <button @click="currentView = 'home'" class="px-3 py-2 rounded-md text-sm font-medium" :class="currentView === 'home' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'">
+                                🏠 Home
+                            </button>
+                            <button @click="currentView = 'forum'" class="px-3 py-2 rounded-md text-sm font-medium" :class="currentView === 'forum' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'">
+                                💬 Forum
+                            </button>
+                            <button @click="currentView = 'chat'" class="px-3 py-2 rounded-md text-sm font-medium" :class="currentView === 'chat' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'">
+                                💭 Chat
+                            </button>
+                            <button @click="currentView = 'tickets'" class="px-3 py-2 rounded-md text-sm font-medium" :class="currentView === 'tickets' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'">
+                                🎫 Tickets
+                            </button>
+                        </div>
+                    </template>
+                </nav>
+
+                <div class="flex items-center space-x-4">
+                    <template x-if="!isAuthenticated">
+                        <button @click="showLoginModal = true" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                            Sign In
+                        </button>
+                        <button @click="showRegisterModal = true" class="btn btn-primary text-sm">
+                            Sign Up
+                        </button>
+                    </template>
+                    
+                    <template x-if="isAuthenticated">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-right hidden lg:block">
+                                <div class="text-sm font-medium text-white" x-text="currentUser.username"></div>
+                                <div class="text-xs" :class="getRoleColor(currentUser.role)">
+                                    <span x-text="currentUser.role"></span> • Level <span x-text="currentUser.level"></span>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <button @click="showUserMenu = !showUserMenu" class="flex items-center space-x-2 text-sm rounded-full focus:outline-none">
+                                    <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
+                                        <span class="text-white text-sm font-medium" x-text="currentUser.username.charAt(0).toUpperCase()"></span>
+                                    </div>
+                                </button>
+                                
+                                <div x-show="showUserMenu" x-cloak 
+                                     @click.away="showUserMenu = false"
+                                     class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5">
+                                    <div class="py-1">
+                                        <button @click="currentView = 'profile'; showUserMenu = false" class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">
+                                            👤 Profile
+                                        </button>
+                                        <button @click="logout(); showUserMenu = false" class="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700">
+                                            🚪 Sign Out
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="min-h-screen">
+        <!-- Home View -->
+        <div x-show="currentView === 'home'" x-cloak>
+            <div class="relative overflow-hidden bg-gradient-to-r from-blue-900 via-purple-900 to-indigo-900">
+                <div class="absolute inset-0 bg-black opacity-50"></div>
+                <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+                    <div class="text-center">
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+                            Welcome to <span class="bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">ValandWaffen</span>
+                        </h1>
+                        <p class="text-xl sm:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
+                            The elite community platform for strategic discussions, real-time collaboration, and exclusive recruitment opportunities.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                            <template x-if="isAuthenticated">
+                                <div>
+                                    <button @click="currentView = 'forum'" class="btn btn-primary text-lg px-8 py-3">
+                                        🚀 Enter Forum
+                                    </button>
+                                    <button @click="currentView = 'chat'" class="btn btn-secondary text-lg px-8 py-3 ml-2">
+                                        💬 Join Chat
+                                    </button>
+                                </div>
+                            </template>
+                            <template x-if="!isAuthenticated">
+                                <div>
+                                    <button @click="showRegisterModal = true" class="btn btn-primary text-lg px-8 py-3">
+                                        ⚡ Join Now
+                                    </button>
+                                    <button @click="showLoginModal = true" class="btn btn-secondary text-lg px-8 py-3 ml-2">
+                                        🔐 Sign In
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <section class="py-12 bg-gray-800">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="card text-center">
+                            <div class="text-3xl font-bold text-white mb-1" x-text="stats.totalUsers"></div>
+                            <div class="text-sm text-gray-400">Total Members</div>
+                        </div>
+                        <div class="card text-center">
+                            <div class="text-3xl font-bold text-white mb-1" x-text="stats.totalThreads"></div>
+                            <div class="text-sm text-gray-400">Forum Threads</div>
+                        </div>
+                        <div class="card text-center">
+                            <div class="text-3xl font-bold text-white mb-1" x-text="stats.totalMessages"></div>
+                            <div class="text-sm text-gray-400">Chat Messages</div>
+                        </div>
+                        <div class="card text-center">
+                            <div class="text-3xl font-bold text-white mb-1" x-text="stats.activeTickets"></div>
+                            <div class="text-sm text-gray-400">Active Tickets</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Forum View -->
+        <div x-show="currentView === 'forum'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Forum</h2>
+                <button @click="showNewThreadModal = true" class="btn btn-primary">
+                    ➕ New Thread
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <template x-for="thread in forumThreads" :key="thread.id">
+                    <div class="card hover:bg-gray-700 cursor-pointer" @click="viewThread(thread)">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-semibold text-white mb-2" x-text="thread.title"></h3>
+                                <p class="text-gray-300 text-sm mb-2" x-text="thread.content.substring(0, 150) + '...'"></p>
+                                <div class="flex items-center space-x-4 text-xs text-gray-400">
+                                    <span>👤 <span x-text="thread.author"></span></span>
+                                    <span>💬 <span x-text="thread.replies.length"></span> replies</span>
+                                    <span>👁️ <span x-text="thread.views"></span> views</span>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-400" x-text="formatDate(thread.createdAt)"></div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Chat View -->
+        <div x-show="currentView === 'chat'" x-cloak class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="card">
+                <div class="border-b border-gray-700 pb-4 mb-4">
+                    <h2 class="text-2xl font-bold text-white">💬 Global Chat</h2>
+                    <p class="text-gray-400 text-sm">Real-time community chat</p>
+                </div>
+
+                <div class="h-96 overflow-y-auto mb-4 space-y-2" id="chatMessages">
+                    <template x-for="message in chatMessages" :key="message.id">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center flex-shrink-0">
+                                <span class="text-white text-xs font-medium" x-text="message.author.charAt(0).toUpperCase()"></span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="text-sm font-medium text-white" x-text="message.author"></span>
+                                    <span class="text-xs text-gray-400" x-text="formatDate(message.timestamp)"></span>
+                                </div>
+                                <p class="text-gray-300 text-sm" x-text="message.content"></p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="flex space-x-2">
+                    <input x-model="newChatMessage" @keyup.enter="sendChatMessage" 
+                           type="text" placeholder="Type your message..." 
+                           class="input flex-1">
+                    <button @click="sendChatMessage" class="btn btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tickets View -->
+        <div x-show="currentView === 'tickets'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">🎫 Recruitment Tickets</h2>
+                <button @click="showNewTicketModal = true" class="btn btn-success">
+                    ➕ Open Ticket
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <template x-for="ticket in userTickets" :key="ticket.id">
+                    <div class="card">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-semibold text-white mb-2" x-text="ticket.title"></h3>
+                                <p class="text-gray-300 text-sm mb-2" x-text="ticket.messages[0]?.content"></p>
+                                <div class="flex items-center space-x-4 text-xs text-gray-400">
+                                    <span>📁 <span x-text="ticket.category"></span></span>
+                                    <span>📊 <span class="px-2 py-1 rounded-full" 
+                                           :class="ticket.status === 'open' ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'" 
+                                           x-text="ticket.status"></span>
+                                </div>
+                            </div>
+                            <div class="text-xs text-gray-400" x-text="formatDate(ticket.createdAt)"></div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Profile View -->
+        <div x-show="currentView === 'profile'" x-cloak class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="card">
+                <h2 class="text-2xl font-bold text-white mb-6">👤 Profile</h2>
+                
+                <div class="flex items-center space-x-6 mb-6">
+                    <div class="w-20 h-20 rounded-full bg-gray-600 flex items-center justify-center">
+                        <span class="text-white text-2xl font-medium" x-text="currentUser.username.charAt(0).toUpperCase()"></span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-white" x-text="currentUser.username"></h3>
+                        <p class="text-sm" :class="getRoleColor(currentUser.role)">
+                            <span x-text="currentUser.role"></span> • Level <span x-text="currentUser.level"></span>
+                        </p>
+                        <p class="text-sm text-gray-400"><span x-text="currentUser.xp"></span> XP</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center p-4 bg-gray-700 rounded-lg">
+                        <div class="text-2xl font-bold text-white" x-text="currentUser.level"></div>
+                        <div class="text-sm text-gray-400">Level</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-700 rounded-lg">
+                        <div class="text-2xl font-bold text-white" x-text="currentUser.xp"></div>
+                        <div class="text-sm text-gray-400">Total XP</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-700 rounded-lg">
+                        <div class="text-2xl font-bold text-white" x-text="forumThreads.filter(t => t.author === currentUser.username).length"></div>
+                        <div class="text-sm text-gray-400">Threads Created</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Login Modal -->
+    <div x-show="showLoginModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="showLoginModal = false">
+        <div class="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Sign In</h3>
+            <form @submit.prevent="login">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                        <input x-model="loginForm.email" type="email" required class="input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <input x-model="loginForm.password" type="password" required class="input">
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="btn btn-primary flex-1">Sign In</button>
+                    <button type="button" @click="showLoginModal = false" class="btn btn-secondary flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div x-show="showRegisterModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="showRegisterModal = false">
+        <div class="bg-gray-800 rounded-lg p-8 max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Create Account</h3>
+            <form @submit.prevent="register">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Username</label>
+                        <input x-model="registerForm.username" type="text" required class="input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                        <input x-model="registerForm.email" type="email" required class="input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                        <input x-model="registerForm.password" type="password" required class="input">
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="btn btn-primary flex-1">Create Account</button>
+                    <button type="button" @click="showRegisterModal = false" class="btn btn-secondary flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Thread Modal -->
+    <div x-show="showNewThreadModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="showNewThreadModal = false">
+        <div class="bg-gray-800 rounded-lg p-8 max-w-2xl w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Create New Thread</h3>
+            <form @submit.prevent="createThread">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Title</label>
+                        <input x-model="newThread.title" type="text" required class="input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Content</label>
+                        <textarea x-model="newThread.content" rows="6" required class="input"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="btn btn-primary flex-1">Create Thread</button>
+                    <button type="button" @click="showNewThreadModal = false" class="btn btn-secondary flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Ticket Modal -->
+    <div x-show="showNewTicketModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="showNewTicketModal = false">
+        <div class="bg-gray-800 rounded-lg p-8 max-w-2xl w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Open Recruitment Ticket</h3>
+            <form @submit.prevent="createTicket">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Title</label>
+                        <input x-model="newTicket.title" type="text" required class="input">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Category</label>
+                        <select x-model="newTicket.category" class="input">
+                            <option value="recruitment">Recruitment</option>
+                            <option value="support">Support</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Message</label>
+                        <textarea x-model="newTicket.content" rows="6" required class="input"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="btn btn-success flex-1">Open Ticket</button>
+                    <button type="button" @click="showNewTicketModal = false" class="btn btn-secondary flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function valandWaffenApp() {
+            return {
+                currentView: 'home',
+                isAuthenticated: false,
+                currentUser: null,
+                showLoginModal: false,
+                showRegisterModal: false,
+                showNewThreadModal: false,
+                showNewTicketModal: false,
+                showUserMenu: false,
+                loginForm: { email: '', password: '' },
+                registerForm: { username: '', email: '', password: '' },
+                newThread: { title: '', content: '' },
+                newTicket: { title: '', category: 'recruitment', content: '' },
+                newChatMessage: '',
+                stats: {
+                    totalUsers: 1247,
+                    totalThreads: 384,
+                    totalMessages: 12547,
+                    activeTickets: 23
+                },
+                forumThreads: [],
+                chatMessages: [],
+                userTickets: [],
+
+                init() {
+                    this.loadData();
+                    this.checkAuth();
+                    this.initializeSampleData();
+                },
+
+                loadData() {
+                    const savedData = localStorage.getItem('valandwaffen_data');
+                    if (savedData) {
+                        const data = JSON.parse(savedData);
+                        this.forumThreads = data.forumThreads || [];
+                        this.chatMessages = data.chatMessages || [];
+                        this.userTickets = data.userTickets || [];
+                    }
+                },
+
+                saveData() {
+                    const data = {
+                        forumThreads: this.forumThreads,
+                        chatMessages: this.chatMessages,
+                        userTickets: this.userTickets
+                    };
+                    localStorage.setItem('valandwaffen_data', JSON.stringify(data));
+                },
+
+                checkAuth() {
+                    const savedUser = localStorage.getItem('valandwaffen_user');
+                    if (savedUser) {
+                        this.currentUser = JSON.parse(savedUser);
+                        this.isAuthenticated = true;
+                    }
+                },
+
+                register() {
+                    // Simple hash function for passwords
+                    const hashPassword = (password) => btoa(password + 'salt');
+                    
+                    // Check if user exists
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    if (users.find(u => u.email === this.registerForm.email)) {
+                        alert('User already exists!');
+                        return;
+                    }
+
+                    // Auto-admin for specific email
+                    const role = this.registerForm.email === 'northlable69@gmail.com' ? 'Admin' : 'User';
+
+                    const newUser = {
+                        id: Date.now(),
+                        username: this.registerForm.username,
+                        email: this.registerForm.email,
+                        password: hashPassword(this.registerForm.password),
+                        role: role,
+                        badges: role === 'Admin' ? ['Admin'] : [],
+                        xp: 0,
+                        level: 1,
+                        createdAt: new Date().toISOString()
+                    };
+
+                    users.push(newUser);
+                    localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+
+                    this.currentUser = newUser;
+                    this.isAuthenticated = true;
+                    localStorage.setItem('valandwaffen_user', JSON.stringify(newUser));
+
+                    this.showRegisterModal = false;
+                    this.registerForm = { username: '', email: '', password: '' };
+                },
+
+                login() {
+                    const hashPassword = (password) => btoa(password + 'salt');
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    
+                    const user = users.find(u => 
+                        u.email === this.loginForm.email && 
+                        u.password === hashPassword(this.loginForm.password)
+                    );
+
+                    if (user) {
+                        this.currentUser = user;
+                        this.isAuthenticated = true;
+                        localStorage.setItem('valandwaffen_user', JSON.stringify(user));
+                        this.showLoginModal = false;
+                        this.loginForm = { email: '', password: '' };
+                    } else {
+                        alert('Invalid credentials!');
+                    }
+                },
+
+                logout() {
+                    this.currentUser = null;
+                    this.isAuthenticated = false;
+                    localStorage.removeItem('valandwaffen_user');
+                    this.currentView = 'home';
+                },
+
+                createThread() {
+                    const thread = {
+                        id: Date.now(),
+                        title: this.newThread.title,
+                        content: this.newThread.content,
+                        author: this.currentUser.username,
+                        replies: [],
+                        views: 0,
+                        createdAt: new Date().toISOString()
+                    };
+
+                    this.forumThreads.unshift(thread);
+                    this.saveData();
+                    this.showNewThreadModal = false;
+                    this.newThread = { title: '', content: '' };
+                    
+                    // Add XP
+                    this.addXP(10);
+                },
+
+                createTicket() {
+                    const ticket = {
+                        id: Date.now(),
+                        title: this.newTicket.title,
+                        category: this.newTicket.category,
+                        status: 'open',
+                        createdBy: this.currentUser.username,
+                        messages: [{
+                            content: this.newTicket.content,
+                            author: this.currentUser.username,
+                            timestamp: new Date().toISOString()
+                        }],
+                        createdAt: new Date().toISOString()
+                    };
+
+                    this.userTickets.unshift(ticket);
+                    this.saveData();
+                    this.showNewTicketModal = false;
+                    this.newTicket = { title: '', category: 'recruitment', content: '' };
+                    
+                    // Add XP
+                    this.addXP(15);
+                },
+
+                sendChatMessage() {
+                    if (!this.newChatMessage.trim()) return;
+
+                    const message = {
+                        id: Date.now(),
+                        author: this.currentUser.username,
+                        content: this.newChatMessage,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    this.chatMessages.push(message);
+                    this.saveData();
+                    this.newChatMessage = '';
+                    
+                    // Keep only last 50 messages
+                    if (this.chatMessages.length > 50) {
+                        this.chatMessages = this.chatMessages.slice(-50);
+                    }
+                    
+                    // Add XP (max 50 per day)
+                    this.addXP(1);
+                },
+
+                addXP(amount) {
+                    if (!this.currentUser) return;
+                    
+                    this.currentUser.xp += amount;
+                    
+                    // Calculate level
+                    const xp = this.currentUser.xp;
+                    let level = 1;
+                    if (xp >= 10000) level = 10;
+                    else if (xp >= 8000) level = 9;
+                    else if (xp >= 6400) level = 8;
+                    else if (xp >= 5000) level = 7;
+                    else if (xp >= 3800) level = 6;
+                    else if (xp >= 2800) level = 5;
+                    else if (xp >= 1900) level = 4;
+                    else if (xp >= 1100) level = 3;
+                    else if (xp >= 500) level = 2;
+                    
+                    this.currentUser.level = level;
+                    
+                    // Update in users array
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === this.currentUser.id);
+                    if (userIndex !== -1) {
+                        users[userIndex].xp = this.currentUser.xp;
+                        users[userIndex].level = this.currentUser.level;
+                        localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                    }
+                    
+                    localStorage.setItem('valandwaffen_user', JSON.stringify(this.currentUser));
+                },
+
+                viewThread(thread) {
+                    thread.views++;
+                    this.saveData();
+                    // In a real app, this would navigate to thread detail
+                    alert(`Thread: ${thread.title}\n\n${thread.content}\n\nReplies: ${thread.replies.length}`);
+                },
+
+                getRoleColor(role) {
+                    const colors = {
+                        'Admin': 'text-red-400',
+                        'Leader': 'text-purple-400',
+                        'Co-Leader': 'text-indigo-400',
+                        'Official Member': 'text-green-400',
+                        'User': 'text-gray-400'
+                    };
+                    return colors[role] || 'text-gray-400';
+                },
+
+                formatDate(dateString) {
+                    const date = new Date(dateString);
+                    const now = new Date();
+                    const diff = Math.floor((now - date) / 1000);
+                    
+                    if (diff < 60) return 'just now';
+                    if (diff < 3600) return Math.floor(diff / 60) + ' minutes ago';
+                    if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+                    return Math.floor(diff / 86400) + ' days ago';
+                },
+
+                initializeSampleData() {
+                    // Add some sample data if empty
+                    if (this.forumThreads.length === 0) {
+                        this.forumThreads = [
+                            {
+                                id: 1,
+                                title: 'Welcome to ValandWaffen',
+                                content: 'This is the official welcome thread for all new members. Introduce yourself here!',
+                                author: 'Admin',
+                                replies: [],
+                                views: 245,
+                                createdAt: new Date(Date.now() - 86400000).toISOString()
+                            },
+                            {
+                                id: 2,
+                                title: 'Community Guidelines',
+                                content: 'Please read and follow our community guidelines to maintain a positive environment.',
+                                author: 'Admin',
+                                replies: [],
+                                views: 189,
+                                createdAt: new Date(Date.now() - 172800000).toISOString()
+                            }
+                        ];
+                        this.saveData();
+                    }
+
+                    if (this.chatMessages.length === 0) {
+                        this.chatMessages = [
+                            {
+                                id: 1,
+                                author: 'Admin',
+                                content: 'Welcome to the ValandWaffen chat! Please be respectful and follow the guidelines.',
+                                timestamp: new Date(Date.now() - 3600000).toISOString()
+                            }
+                        ];
+                        this.saveData();
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

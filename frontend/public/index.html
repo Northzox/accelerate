@@ -1,0 +1,2817 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ValandWaffen</title>
+    <meta name="description" content="Elite Community Platform">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/main.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/main.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/main.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/main.png">
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        /* Dark theme */
+        body {
+            background: #000000;
+            color: #ffffff;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Custom background image */
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('icons/backround1.png');
+            background-size: 80% 80%;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(12px);
+            z-index: -1;
+            animation: subtleBackgroundMove 40s ease-in-out infinite;
+        }
+        
+        @keyframes subtleBackgroundMove {
+            0%, 100% {
+                transform: scale(1) translate(0, 0);
+                filter: blur(12px) brightness(0.4);
+            }
+            25% {
+                transform: scale(1.02) translate(-10px, -5px);
+                filter: blur(12px) brightness(0.45);
+            }
+            50% {
+                transform: scale(1.01) translate(5px, -8px);
+                filter: blur(12px) brightness(0.42);
+            }
+            75% {
+                transform: scale(1.015) translate(-8px, 5px);
+                filter: blur(12px) brightness(0.48);
+            }
+        }
+        
+        /* Dark overlay for better text readability */
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        
+        /* Bullet sparkles background animation */
+        .sparkles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .sparkle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 3s linear infinite;
+        }
+        
+        @keyframes sparkle {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        /* Custom dark inputs */
+        .input-dark {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            color: #ffffff;
+            padding: 14px 18px;
+            border-radius: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .input-dark:focus {
+            outline: none;
+            border-color: #333333;
+            background: #0f0f0f;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-dark::placeholder {
+            color: #666666;
+        }
+        
+        /* Dark buttons */
+        .btn-dark {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .btn-dark:hover {
+            background: #1a1a1a;
+            border-color: #333333;
+        }
+        
+        .btn-primary-dark {
+            background: #0a0a0a;
+            border: 1px solid #ffffff;
+            color: #ffffff;
+            padding: 14px 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .btn-primary-dark:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+        
+        /* Dark cards */
+        .card-dark {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 24px;
+        }
+        
+        /* Navigation */
+        .nav-dark {
+            background: #0a0a0a;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        
+        .nav-link {
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: #1a1a1a;
+        }
+        
+        .nav-link.active {
+            background: #1a1a1a;
+        }
+        
+        /* Content container */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Profile banner */
+        .profile-banner {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .profile-pfp {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #000000;
+            position: absolute;
+            bottom: -40px;
+            left: 24px;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            object-fit: cover;
+        }
+        
+        /* Profile picture styles for all locations */
+        .profile-pfp,
+        .w-8.h-8.rounded-full,
+        .w-12.h-12.rounded-full {
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+        }
+        
+        /* Ensure GIFs animate in profile pictures */
+        .profile-pfp img,
+        .w-8.h-8.rounded-full img,
+        .w-12.h-12.rounded-full img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+        }
+        
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        .notification-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid #059669;
+        }
+        
+        .notification-error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid #dc2626;
+        }
+        
+        .notification-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2563eb;
+        }
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        /* File attachment styles */
+        .file-attachment {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            margin: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-attachment:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .file-attachment-image {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 6px;
+            margin: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .file-attachment-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .file-attachment-video {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 6px;
+            margin: 4px;
+        }
+        
+        .file-preview-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .file-preview-content {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            color: white;
+            transition: all 0.2s;
+        }
+        
+        .file-input-label:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        .badge-leader { background: #7c3aed; color: white; }
+        .badge-coleader { background: #6366f1; color: white; }
+        .badge-member { background: #059669; color: white; }
+        .badge-veteran { background: #ea580c; color: white; }
+        .badge-elite { background: #f59e0b; color: white; }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen" x-data="valandWaffenApp()">
+    <!-- Custom Background -->
+    <div class="background-image"></div>
+    <div class="background-overlay"></div>
+    
+    <!-- Bullet Sparkles Background -->
+    <div class="sparkles" id="sparkles"></div>
+    
+    <!-- Navigation -->
+    <header class="nav-dark sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <img src="icons/main.png" alt="ValandWaffen" class="h-10 w-10 rounded-lg">
+                    <span class="text-xl font-bold text-white">ValandWaffen</span>
+                </div>
+                
+                <nav class="flex space-x-6 overflow-x-auto">
+                    <button @click="currentView = 'home'" class="nav-link" :class="currentView === 'home' ? 'active' : ''">
+                        Home
+                    </button>
+                    <button @click="currentView = 'forum'" class="nav-link" :class="currentView === 'forum' ? 'active' : ''">
+                        Forum
+                    </button>
+                    <button @click="currentView = 'chat'" class="nav-link" :class="currentView === 'chat' ? 'active' : ''">
+                        Chat
+                    </button>
+                    <template x-if="isAuthenticated">
+                        <button @click="currentView = 'tickets'" class="nav-link" :class="currentView === 'tickets' ? 'active' : ''">
+                            Tickets
+                        </button>
+                        <button @click="currentView = 'friends'" class="nav-link" :class="currentView === 'friends' ? 'active' : ''">
+                            Friends
+                        </button>
+                        <button @click="currentView = 'messages'" class="nav-link" :class="currentView === 'messages' ? 'active' : ''">
+                            Messages
+                        </button>
+                        <button @click="goToProfile()" class="nav-link" :class="currentView === 'profile' ? 'active' : ''">
+                            Profile
+                        </button>
+                        <button x-show="currentUser.role === 'Admin' || currentUser.role === 'Owner'" @click="currentView = 'admin'" class="nav-link" :class="currentView === 'admin' ? 'active' : ''">
+                            Admin
+                        </button>
+                    </template>
+                </nav>
+
+                <div class="flex items-center space-x-4">
+                    <template x-if="!isAuthenticated">
+                        <button @click="showLoginModal = true" class="btn-primary-dark">
+                            Sign In
+                        </button>
+                    </template>
+                    
+                    <template x-if="isAuthenticated">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-right hidden lg:block">
+                                <div class="text-sm font-medium text-white" x-text="currentUser.username"></div>
+                                <div class="text-xs text-gray-400">
+                                    <span x-text="currentUser.role"></span> • Level <span x-text="currentUser.level"></span>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <button @click="showUserMenu = !showUserMenu" class="flex items-center space-x-2 text-sm rounded-full">
+                                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center"
+                                         :style="currentUser.profilePicture ? `background-image: url(${currentUser.profilePicture}); background-size: cover; background-position: center;` : ''">
+                                        <span x-show="!currentUser.profilePicture" class="text-white text-sm font-medium" x-text="currentUser.username.charAt(0).toUpperCase()"></span>
+                                    </div>
+                                </button>
+                                
+                                <div x-show="showUserMenu" x-cloak 
+                                     @click.away="showUserMenu = false"
+                                     class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-black border border-gray-800">
+                                    <div class="py-1">
+                                        <button @click="goToProfile(); showUserMenu = false" class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-900">
+                                            Profile
+                                        </button>
+                                        <button @click="currentView = 'friends'; showUserMenu = false" class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-900">
+                                            Friends
+                                        </button>
+                                        <button @click="currentView = 'messages'; showUserMenu = false" class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-900">
+                                            Messages
+                                        </button>
+                                        <template x-if="currentUser.role === 'Admin' || currentUser.role === 'Owner'">
+                                            <button @click="currentView = 'admin'; showUserMenu = false" class="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-900">
+                                                Admin Panel
+                                            </button>
+                                        </template>
+                                        <button @click="logout(); showUserMenu = false" class="block w-full text-left px-4 py-2 text-sm text-gray-400 hover:bg-gray-900">
+                                            Sign Out
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-wrapper min-h-screen">
+        <!-- Home View -->
+        <div x-show="currentView === 'home'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-white mb-4">Welcome to ValandWaffen</h1>
+                <p class="text-gray-400 text-lg">Connect, share, and engage with our community</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="card-dark text-center">
+                    <div class="text-3xl mb-4">💬</div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Forum</h3>
+                    <p class="text-gray-400 text-sm">Join discussions and share your thoughts</p>
+                    <button @click="currentView = 'forum'" class="btn-primary-dark mt-4">Visit Forum</button>
+                </div>
+                <div class="card-dark text-center">
+                    <div class="text-3xl mb-4">💭</div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Live Chat</h3>
+                    <p class="text-gray-400 text-sm">Real-time conversations with community members</p>
+                    <button @click="currentView = 'chat'" class="btn-primary-dark mt-4">Join Chat</button>
+                </div>
+                <div class="card-dark text-center">
+                    <div class="text-3xl mb-4">🎫</div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Support</h3>
+                    <p class="text-gray-400 text-sm">Get help and support from our team</p>
+                    <button @click="currentView = 'tickets'" class="btn-primary-dark mt-4">Open Ticket</button>
+                </div>
+            </div>
+
+            <template x-if="isAuthenticated">
+                <div class="card-dark">
+                    <h2 class="text-2xl font-bold text-white mb-6">Your Activity</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="text-center p-4 bg-gray-900 rounded-lg">
+                            <div class="text-2xl font-bold text-white" x-text="currentUser.level"></div>
+                            <div class="text-sm text-gray-400">Level</div>
+                        </div>
+                        <div class="text-center p-4 bg-gray-900 rounded-lg">
+                            <div class="text-2xl font-bold text-white" x-text="currentUser.xp"></div>
+                            <div class="text-sm text-gray-400">Total XP</div>
+                        </div>
+                        <div class="text-center p-4 bg-gray-900 rounded-lg">
+                            <div class="text-2xl font-bold text-white" x-text="friends.length"></div>
+                            <div class="text-sm text-gray-400">Friends</div>
+                        </div>
+                        <div class="text-center p-4 bg-gray-900 rounded-lg">
+                            <div class="text-2xl font-bold text-white" x-text="forumThreads.filter(t => t.author === currentUser.username).length"></div>
+                            <div class="text-sm text-gray-400">Threads</div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Forum View -->
+        <div x-show="currentView === 'forum'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Forum</h2>
+                <template x-if="isAuthenticated">
+                    <button @click="showNewThreadModal = true" class="btn-primary-dark">
+                        New Thread
+                    </button>
+                </template>
+                <template x-if="!isAuthenticated">
+                    <button @click="showLoginModal = true" class="btn-primary-dark">
+                        Sign in to create thread
+                    </button>
+                </template>
+                <template x-if="isAuthenticated && !canPostThread()">
+                    <button disabled class="btn-dark opacity-50 cursor-not-allowed">
+                        Threads Locked
+                    </button>
+                </template>
+            </div>
+
+            <div class="space-y-4">
+                <template x-for="thread in forumThreads" :key="thread.id">
+                    <div class="card-dark hover:bg-gray-900 cursor-pointer transition-all" @click="viewThread(thread)">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-white mb-2" x-text="thread.title"></h3>
+                                <p class="text-gray-400 text-sm mb-3" x-text="thread.content.substring(0, 200) + '...'"></p>
+                                <div class="flex items-center space-x-6 text-xs text-gray-500">
+                                    <span class="flex items-center space-x-1">
+                                        <div class="w-4 h-4 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer"
+                                             @mouseenter="showMiniProfile(thread.author, $event)"
+                                             @mouseleave="hideMiniProfile"
+                                             :style="getUserProfilePicture(thread.author) ? `background-image: url(${getUserProfilePicture(thread.author)}); background-size: cover; background-position: center;` : ''">
+                                            <span x-show="!getUserProfilePicture(thread.author)" class="text-white text-xs" x-text="thread.author.charAt(0).toUpperCase()"></span>
+                                        </div>
+                                        <span class="cursor-pointer hover:text-blue-400" 
+                                              @mouseenter="showMiniProfile(thread.author, $event)"
+                                              @mouseleave="hideMiniProfile"
+                                              x-text="thread.author"></span>
+                                    </span>
+                                    <span>Replies: <span x-text="thread.replies.length"></span></span>
+                                    <span>Views: <span x-text="thread.views"></span></span>
+                                    <span x-text="formatDate(thread.createdAt)"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Chat View -->
+        <div x-show="currentView === 'chat'" x-cloak class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="card-dark">
+                <div class="border-b border-gray-800 pb-4 mb-4">
+                    <h2 class="text-2xl font-bold text-white">Global Chat</h2>
+                    <p class="text-gray-400 text-sm">Real-time community chat</p>
+                </div>
+
+                <div class="h-96 overflow-y-auto mb-4 space-y-3" id="chatMessages">
+                    <template x-for="message in chatMessages" :key="message.id">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer"
+                                 @mouseenter="showMiniProfile(message.author, $event)"
+                                 @mouseleave="hideMiniProfile"
+                                 @click="viewUserProfileFromMiniProfile(message.author)"
+                                 :style="getUserProfilePicture(message.author) ? `background-image: url(${getUserProfilePicture(message.author)}); background-size: cover; background-position: center;` : ''">
+                                <span x-show="!getUserProfilePicture(message.author)" class="text-white text-xs font-medium" x-text="message.author.charAt(0).toUpperCase()"></span>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <span class="text-sm font-medium text-white cursor-pointer hover:text-blue-400" 
+                                          @mouseenter="showMiniProfile(message.author, $event)"
+                                          @mouseleave="hideMiniProfile"
+                                          @click="viewUserProfileFromMiniProfile(message.author)"
+                                          x-text="message.author"></span>
+                                    <span class="text-xs text-gray-500" x-text="formatDate(message.timestamp)"></span>
+                                </div>
+                                <div class="relative group">
+                                    <p class="text-gray-300 text-sm" x-text="message.content"></p>
+                                    <!-- File Attachments -->
+                                    <template x-if="message.attachments && message.attachments.length > 0">
+                                        <div class="mt-2 flex flex-wrap">
+                                            <template x-for="file in message.attachments" :key="file.id">
+                                                <div @click="previewFile(file)" class="file-attachment">
+                                                    <template x-if="file.type.startsWith('image/')">
+                                                        <img :src="file.data" :alt="file.name" class="file-attachment-image">
+                                                    </template>
+                                                    <template x-if="file.type.startsWith('video/')">
+                                                        <video :src="file.data" class="file-attachment-video" controls></video>
+                                                    </template>
+                                                    <template x-if="!file.type.startsWith('image/') && !file.type.startsWith('video/')">
+                                                        <span class="text-xs">📎 <span x-text="file.name"></span></span>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                    <template x-if="(currentUser.role === 'Admin' || currentUser.role === 'Owner') && message.author !== currentUser.username">
+                                        <button @click="deleteChatMessage(message)" 
+                                                class="absolute top-0 right-0 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity text-xs">
+                                            🗑️
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <template x-if="isAuthenticated">
+                    <div class="space-y-2">
+                        <!-- File Attachments Preview -->
+                        <template x-if="chatAttachments.length > 0">
+                            <div class="flex flex-wrap items-center space-x-2 p-2 bg-gray-900 rounded">
+                                <template x-for="file in chatAttachments" :key="file.id">
+                                    <div class="relative">
+                                        <template x-if="file.type.startsWith('image/')">
+                                            <img :src="file.data" :alt="file.name" class="w-12 h-12 object-cover rounded">
+                                        </template>
+                                        <template x-else>
+                                            <span class="text-xs bg-gray-800 px-2 py-1 rounded">📎 <span x-text="file.name.substring(0, 10) + '...'"></span></span>
+                                        </template>
+                                        <button @click="chatAttachments = chatAttachments.filter(f => f.id !== file.id)" 
+                                                class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs">✕</button>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        
+                        <div class="flex space-x-2">
+                            <div class="file-input-wrapper">
+                                <label class="file-input-label">
+                                    📎 Attach File
+                                    <input type="file" multiple @change="handleChatFileUpload($event)">
+                                </label>
+                            </div>
+                            <input x-model="newChatMessage" @keyup.enter="sendChatMessage" 
+                                   type="text" placeholder="Type your message..." 
+                                   class="input-dark flex-1">
+                            <button @click="sendChatMessage" class="btn-primary-dark">Send</button>
+                        </div>
+                    </div>
+                </template>
+                <template x-if="!isAuthenticated">
+                    <div class="text-center py-4">
+                        <button @click="showLoginModal = true" class="btn-primary-dark">Sign in to chat</button>
+                    </div>
+                </template>
+                <template x-if="isAuthenticated && !canPostChat()">
+                    <div class="text-center py-4 text-yellow-400">
+                        Chat is locked by admin
+                    </div>
+                </template>
+                <template x-if="isAuthenticated && isBanned()">
+                    <div class="text-center py-4 text-red-400">
+                        You are banned from chat
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Tickets View -->
+        <div x-show="currentView === 'tickets'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-white">Support Tickets</h2>
+                <button @click="showNewTicketModal = true" class="btn-primary-dark">
+                    Open Ticket
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <template x-for="ticket in getVisibleTickets()" :key="ticket.id">
+                    <div class="card-dark hover:bg-gray-900 cursor-pointer transition-all" @click="openTicket(ticket)">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-white mb-2" x-text="ticket.title"></h3>
+                                <p class="text-gray-400 text-sm mb-3" x-text="ticket.messages[0]?.content"></p>
+                                <div class="flex items-center space-x-6 text-xs text-gray-500">
+                                    <span>Category: <span x-text="ticket.category"></span></span>
+                                    <span>Created by: <span x-text="ticket.createdBy"></span></span>
+                                    <span class="px-2 py-1 rounded-full" 
+                                           :class="ticket.status === 'open' ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'" 
+                                           x-text="ticket.status"></span>
+                                    <span x-text="formatDate(ticket.createdAt)"></span>
+                                    <span x-show="ticket.messages.length > 1">
+                                        Last reply: <span x-text="formatDate(ticket.messages[ticket.messages.length - 1].timestamp)"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Ticket Chat View -->
+        <div x-show="currentView === 'ticketChat'" x-cloak class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <template x-if="selectedTicket">
+                <div class="card-dark">
+                    <!-- Ticket Header -->
+                    <div class="border-b border-gray-800 pb-4 mb-4">
+                        <div class="flex items-center justify-between">
+                            <button @click="currentView = 'tickets'" class="text-gray-400 hover:text-white mb-4">
+                                ← Back to Tickets
+                            </button>
+                            <div x-show="currentUser.role === 'Admin' || currentUser.role === 'Owner'" class="flex space-x-2">
+                                <button @click="lockTicket(selectedTicket)" class="text-yellow-400 hover:text-yellow-300 text-sm">
+                                    <span x-text="selectedTicket.status === 'locked' ? 'Unlock' : 'Lock'"></span> Ticket
+                                </button>
+                                <button @click="deleteTicket(selectedTicket)" class="text-red-400 hover:text-red-300 text-sm">
+                                    Delete Ticket
+                                </button>
+                            </div>
+                        </div>
+                        <h1 class="text-2xl font-bold text-white mb-4" x-text="selectedTicket.title"></h1>
+                        <div class="flex items-center space-x-4 text-sm text-gray-400">
+                            <span>Category: <span x-text="selectedTicket.category"></span></span>
+                            <span>Status: <span class="px-2 py-1 rounded-full" 
+                                           :class="selectedTicket.status === 'open' ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'" 
+                                           x-text="selectedTicket.status"></span></span>
+                            <span>Created by: <span x-text="selectedTicket.createdBy"></span></span>
+                            <span x-text="formatDate(selectedTicket.createdAt)"></span>
+                        </div>
+                    </div>
+
+                    <!-- Ticket Messages -->
+                    <div class="h-96 overflow-y-auto mb-4 space-y-3">
+                        <template x-for="message in selectedTicket.messages" :key="message.id">
+                            <div class="flex items-start space-x-3" :class="message.author === currentUser.username ? 'flex-row-reverse space-x-reverse' : ''">
+                                <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0"
+                                     :style="getUserProfilePicture(message.author) ? `background-image: url(${getUserProfilePicture(message.author)}); background-size: cover; background-position: center;` : ''">
+                                    <span x-show="!getUserProfilePicture(message.author)" class="text-white text-xs" x-text="message.author.charAt(0).toUpperCase()"></span>
+                                </div>
+                                <div class="flex-1 max-w-xs">
+                                    <div class="flex items-center space-x-2 mb-1">
+                                        <span class="text-sm font-medium text-white" x-text="message.author"></span>
+                                        <span class="text-xs text-gray-500" x-text="formatDate(message.timestamp)"></span>
+                                        <template x-if="message.role">
+                                            <span class="text-xs px-2 py-1 rounded" 
+                                                  :class="message.role === 'Admin' || message.role === 'Owner' ? 'bg-blue-900 text-blue-200' : 'bg-gray-700 text-gray-300'" 
+                                                  x-text="message.role"></span>
+                                        </template>
+                                    </div>
+                                    <div class="relative group">
+                                        <div class="text-sm text-white p-3 rounded-lg break-words" 
+                                             :class="message.author === currentUser.username ? 'bg-blue-900' : 'bg-gray-800'">
+                                            <span x-text="message.content"></span>
+                                            <!-- File Attachments -->
+                                            <template x-if="message.attachments && message.attachments.length > 0">
+                                                <div class="mt-2 flex flex-wrap">
+                                                    <template x-for="file in message.attachments" :key="file.id">
+                                                        <div @click="previewFile(file)" class="file-attachment">
+                                                            <template x-if="file.type.startsWith('image/')">
+                                                                <img :src="file.data" :alt="file.name" class="file-attachment-image">
+                                                            </template>
+                                                            <template x-if="file.type.startsWith('video/')">
+                                                                <video :src="file.data" class="file-attachment-video" controls></video>
+                                                            </template>
+                                                            <template x-if="!file.type.startsWith('image/') && !file.type.startsWith('video/')">
+                                                                <span class="text-xs">📎 <span x-text="file.name"></span></span>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <template x-if="message.author === currentUser.username">
+                                            <button @click="deleteTicketMessage(message)" 
+                                                    class="absolute top-0 right-0 -mr-6 -mt-1 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity text-xs">
+                                                🗑️
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Message Input -->
+                    <template x-if="selectedTicket.status !== 'locked' && canAccessTicket(selectedTicket)">
+                        <div class="space-y-2">
+                            <!-- File Attachments Preview -->
+                            <template x-if="ticketAttachments.length > 0">
+                                <div class="flex flex-wrap items-center space-x-2 p-2 bg-gray-900 rounded">
+                                    <template x-for="file in ticketAttachments" :key="file.id">
+                                        <div class="relative">
+                                            <template x-if="file.type.startsWith('image/')">
+                                                <img :src="file.data" :alt="file.name" class="w-12 h-12 object-cover rounded">
+                                            </template>
+                                            <template x-else>
+                                                <span class="text-xs bg-gray-800 px-2 py-1 rounded">📎 <span x-text="file.name.substring(0, 10) + '...'"></span></span>
+                                            </template>
+                                            <button @click="ticketAttachments = ticketAttachments.filter(f => f.id !== file.id)" 
+                                                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs">✕</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            
+                            <div class="flex space-x-2">
+                                <div class="file-input-wrapper">
+                                    <label class="file-input-label">
+                                        📎 Attach File
+                                        <input type="file" multiple @change="handleTicketFileUpload($event)">
+                                    </label>
+                                </div>
+                                <input x-model="newTicketMessage" @keyup.enter="sendTicketMessage" 
+                                       type="text" placeholder="Type your message..." 
+                                       class="input-dark flex-1">
+                                <button @click="sendTicketMessage" class="btn-primary-dark">Send</button>
+                            </div>
+                        </div>
+                    </template>
+                    <div x-show="selectedTicket.status === 'locked'" class="text-center py-4 text-yellow-400">
+                        This ticket has been locked
+                    </div>
+                    <div x-show="!canAccessTicket(selectedTicket)" class="text-center py-4 text-red-400">
+                        You don't have access to this ticket
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Messages View -->
+        <div x-show="currentView === 'messages'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Conversations List -->
+                <div class="card-dark">
+                    <h3 class="text-lg font-semibold text-white mb-4">💬 Direct Messages</h3>
+                    <div class="space-y-2 max-h-96 overflow-y-auto">
+                        <template x-for="conversation in getConversations()" :key="conversation.id">
+                            <div class="flex items-center justify-between p-3 bg-gray-900 rounded-lg hover:bg-gray-800 cursor-pointer"
+                                 @click="openConversation(conversation)">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center"
+                                         :style="conversation.profilePicture ? `background-image: url(${conversation.profilePicture}); background-size: cover; background-position: center;` : ''">
+                                        <span x-show="!conversation.profilePicture" class="text-white text-sm" x-text="conversation.username.charAt(0).toUpperCase()"></span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-white" x-text="conversation.username"></div>
+                                        <div class="text-xs text-gray-400 truncate" x-text="conversation.lastMessage"></div>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-gray-500" x-text="formatDate(conversation.lastMessageTime)"></div>
+                            </div>
+                        </template>
+                        <div x-show="getConversations().length === 0" class="text-center text-gray-500 py-8">
+                            No conversations yet
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Area -->
+                <div class="lg:col-span-2 card-dark">
+                    <template x-if="selectedConversation">
+                        <div class="border-b border-gray-800 pb-4 mb-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center cursor-pointer"
+                                         @click="viewUserProfile(selectedConversation)"
+                                         :style="selectedConversation.profilePicture ? `background-image: url(${selectedConversation.profilePicture}); background-size: cover; background-position: center;` : ''">
+                                        <span x-show="!selectedConversation.profilePicture" class="text-white text-sm" x-text="selectedConversation.username.charAt(0).toUpperCase()"></span>
+                                    </div>
+                                    <div>
+                                        <div class="text-lg font-semibold text-white cursor-pointer hover:text-blue-400" 
+                                             @click="viewUserProfile(selectedConversation)"
+                                             x-text="selectedConversation.username"></div>
+                                        <div class="text-xs text-gray-400">Level <span x-text="selectedConversation.level"></span></div>
+                                    </div>
+                                </div>
+                                <button @click="selectedConversation = null" class="text-gray-400 hover:text-white">✕</button>
+                            </div>
+                        </div>
+                        
+                        <div class="h-96 overflow-y-auto mb-4 space-y-3">
+                            <template x-for="message in getConversationMessages(selectedConversation.id)" :key="message.id">
+                                <div class="flex items-start space-x-3" :class="message.from === currentUser.id ? 'flex-row-reverse space-x-reverse' : ''">
+                                    <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0"
+                                         :style="message.fromProfilePicture ? `background-image: url(${message.fromProfilePicture}); background-size: cover; background-position: center;` : ''">
+                                        <span x-show="!message.fromProfilePicture" class="text-white text-xs" x-text="message.from.charAt(0).toUpperCase()"></span>
+                                    </div>
+                                    <div class="flex-1 max-w-xs">
+                                        <div class="text-xs text-gray-500 mb-1" x-text="formatDate(message.timestamp)"></div>
+                                        <div class="relative group">
+                                            <div class="text-sm text-white p-3 rounded-lg break-words" 
+                                                 :class="message.from === currentUser.id ? 'bg-blue-900' : 'bg-gray-800'">
+                                                <span x-text="message.content"></span>
+                                            </div>
+                                            <template x-if="message.from === currentUser.id">
+                                                <button @click="deleteMessage(message)" 
+                                                        class="absolute top-0 right-0 -mr-6 -mt-1 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity text-xs">
+                                                    🗑️
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        
+                        <div class="flex space-x-2">
+                            <input x-model="newMessage" @keyup.enter="sendMessage" 
+                                   type="text" placeholder="Type a message..." 
+                                   class="input-dark flex-1">
+                            <button @click="sendMessage" class="btn-primary-dark">Send</button>
+                        </div>
+                    </template>
+                    <template x-if="!selectedConversation">
+                        <div class="text-center text-gray-500 py-16">
+                            Select a conversation to start messaging
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile View -->
+        <div x-show="currentView === 'userProfile'" x-cloak class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <template x-if="viewedUser">
+                <div class="card-dark">
+                    <!-- Back Button -->
+                    <button @click="currentView = 'messages'" class="text-gray-400 hover:text-white mb-6">
+                        ← Back to Messages
+                    </button>
+
+                    <!-- Profile Header -->
+                    <div class="relative">
+                        <div class="profile-banner" :style="viewedUser.profileBanner ? `background-image: url(${viewedUser.profileBanner})` : ''">
+                            <div class="profile-pfp" :style="viewedUser.profilePicture ? `background-image: url(${viewedUser.profilePicture}); background-size: cover; background-position: center;` : ''">
+                                <span x-show="!viewedUser.profilePicture" class="text-white text-2xl font-medium" x-text="viewedUser.username.charAt(0).toUpperCase()"></span>
+                            </div>
+                        </div>
+                        <div class="pt-12 pb-6">
+                            <div class="flex items-end justify-between">
+                                <div>
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <h3 class="text-xl font-semibold text-white" x-text="viewedUser.username"></h3>
+                                        <template x-for="badge in viewedUser.badges" :key="badge">
+                                            <span class="badge" :class="'badge-' + badge.toLowerCase().replace(' ', '')" x-text="badge"></span>
+                                        </template>
+                                    </div>
+                                    <p class="text-sm text-gray-400">
+                                        <span x-text="viewedUser.role"></span> • Level <span x-text="viewedUser.level"></span>
+                                    </p>
+                                    <p class="text-sm text-gray-500"><span x-text="viewedUser.xp"></span> XP</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <template x-if="!isCurrentUser(viewedUser) && !isFriend(viewedUser) && !hasSentRequest(viewedUser)">
+                                        <button @click="sendFriendRequest(viewedUser)" class="btn-primary-dark">
+                                            Add Friend
+                                        </button>
+                                    </template>
+                                    <template x-if="!isCurrentUser(viewedUser) && hasSentRequest(viewedUser)">
+                                        <button disabled class="btn-dark opacity-50 cursor-not-allowed">
+                                            Request Sent
+                                        </button>
+                                    </template>
+                                    <template x-if="!isCurrentUser(viewedUser) && isFriend(viewedUser)">
+                                        <button @click="openConversationFromProfile(viewedUser)" class="btn-primary-dark">
+                                            Send Message
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="text-center p-4 bg-gray-900 rounded-lg">
+                            <div class="text-2xl font-bold text-white" x-text="viewedUser.level"></div>
+                            <div class="text-sm text-gray-400">Level</div>
+                        </div>
+                        <div class="text-center p-4 bg-gray-900 rounded-lg">
+                            <div class="text-2xl font-bold text-white" x-text="viewedUser.xp"></div>
+                            <div class="text-sm text-gray-400">Total XP</div>
+                        </div>
+                        <div class="text-center p-4 bg-gray-900 rounded-lg">
+                            <div class="text-2xl font-bold text-white" x-text="forumThreads.filter(t => t.author === viewedUser.username).length"></div>
+                            <div class="text-sm text-gray-400">Threads</div>
+                        </div>
+                        <div class="text-center p-4 bg-gray-900 rounded-lg">
+                            <div class="text-2xl font-bold text-white" x-text="chatMessages.filter(m => m.author === viewedUser.username).length"></div>
+                            <div class="text-sm text-gray-400">Messages</div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Friends View -->
+        <div x-show="currentView === 'friends'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Friends List -->
+                <div class="card-dark">
+                    <h3 class="text-lg font-semibold text-white mb-4">👥 Friends</h3>
+                    <div class="space-y-2 max-h-96 overflow-y-auto">
+                        <template x-for="friend in friends" :key="friend.id">
+                            <div class="flex items-center justify-between p-2 bg-gray-900 rounded hover:bg-gray-800 cursor-pointer"
+                                 @click="openPrivateChat(friend)">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center"
+                                         :style="friend.profilePicture ? `background-image: url(${friend.profilePicture}); background-size: cover;` : ''">
+                                        <span x-show="!friend.profilePicture" class="text-white text-xs" x-text="friend.username.charAt(0).toUpperCase()"></span>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-white" x-text="friend.username"></div>
+                                        <div class="text-xs text-gray-400">Level <span x-text="friend.level"></span></div>
+                                    </div>
+                                </div>
+                                <button @click.stop="removeFriend(friend)" class="text-red-400 hover:text-red-300 text-sm">
+                                    Remove
+                                </button>
+                            </div>
+                        </template>
+                        <div x-show="friends.length === 0" class="text-center text-gray-500 py-8">
+                            No friends yet
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Friend Requests -->
+                <div class="card-dark">
+                    <h3 class="text-lg font-semibold text-white mb-4">📬 Friend Requests</h3>
+                    <div class="space-y-2 max-h-96 overflow-y-auto">
+                        <template x-for="request in friendRequests" :key="request.id">
+                            <div class="p-3 bg-gray-900 rounded">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center"
+                                             :style="request.from.profilePicture ? `background-image: url(${request.from.profilePicture}); background-size: cover;` : ''">
+                                            <span x-show="!request.from.profilePicture" class="text-white text-xs" x-text="request.from.username.charAt(0).toUpperCase()"></span>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-medium text-white" x-text="request.from.username"></div>
+                                            <div class="text-xs text-gray-400">Level <span x-text="request.from.level"></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button @click="acceptFriendRequest(request)" class="btn-primary-dark text-xs flex-1">Accept</button>
+                                    <button @click="declineFriendRequest(request)" class="btn-dark text-xs flex-1">Decline</button>
+                                </div>
+                            </div>
+                        </template>
+                        <div x-show="friendRequests.length === 0" class="text-center text-gray-500 py-8">
+                            No pending requests
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Find Users -->
+                <div class="card-dark">
+                    <h3 class="text-lg font-semibold text-white mb-4">🔍 Find Users</h3>
+                    <input x-model="userSearchQuery" @input="searchUsers" type="text" placeholder="Search users..." class="input-dark mb-4">
+                    <div class="space-y-2 max-h-80 overflow-y-auto">
+                        <template x-for="user in searchedUsers" :key="user.id">
+                            <div class="flex items-center justify-between p-2 bg-gray-900 rounded">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center"
+                                         :style="user.profilePicture ? `background-image: url(${user.profilePicture}); background-size: cover;` : ''">
+                                        <span x-show="!user.profilePicture" class="text-white text-xs" x-text="user.username.charAt(0).toUpperCase()"></span>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-white" x-text="user.username"></div>
+                                        <div class="text-xs text-gray-400">Level <span x-text="user.level"></span></div>
+                                    </div>
+                                </div>
+                                <button x-show="!isFriend(user) && !hasSentRequest(user)" 
+                                        @click="sendFriendRequest(user)" 
+                                        class="btn-primary-dark text-xs">
+                                    Add Friend
+                                </button>
+                                <span x-show="isFriend(user)" class="text-xs text-green-400">Friends</span>
+                                <span x-show="hasSentRequest(user)" class="text-xs text-yellow-400">Request Sent</span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Private Chat Modal -->
+            <div x-show="showPrivateChat" x-cloak class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" @click.self="showPrivateChat = false">
+                <div class="card-dark max-w-2xl w-full mx-4 max-h-96">
+                    <div class="border-b border-gray-800 pb-4 mb-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-white">
+                                💬 Chat with <span x-text="privateChatUser?.username"></span>
+                            </h3>
+                            <button @click="showPrivateChat = false" class="text-gray-400 hover:text-white">✕</button>
+                        </div>
+                    </div>
+                    
+                    <div class="h-64 overflow-y-auto mb-4 space-y-3">
+                        <template x-for="message in getPrivateMessages(privateChatUser.id)" :key="message.id">
+                            <div class="flex items-start space-x-3" :class="message.from === currentUser.id ? 'flex-row-reverse space-x-reverse' : ''">
+                                <div class="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center flex-shrink-0">
+                                    <span class="text-white text-xs" x-text="message.from === currentUser.id ? 'You' : message.from.charAt(0).toUpperCase()"></span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-xs text-gray-500 mb-1" x-text="formatDate(message.timestamp)"></div>
+                                    <div class="text-sm text-white p-2 rounded-lg" 
+                                         :class="message.from === currentUser.id ? 'bg-blue-900' : 'bg-gray-800'">
+                                        <span x-text="message.content"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <input x-model="newPrivateMessage" @keyup.enter="sendPrivateMessage" 
+                               type="text" placeholder="Type a message..." 
+                               class="input-dark flex-1">
+                        <button @click="sendPrivateMessage" class="btn-primary-dark">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thread View -->
+        <div x-show="currentView === 'thread'" x-cloak class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <template x-if="selectedThread">
+                <div class="card-dark">
+                    <!-- Thread Header -->
+                    <div class="border-b border-gray-800 pb-4 mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <button @click="currentView = 'forum'" class="text-gray-400 hover:text-white">
+                                ← Back to Forum
+                            </button>
+                            <template x-if="(currentUser.role === 'Admin' || currentUser.role === 'Owner') && (selectedThread.author !== currentUser.username)">
+                                <div class="flex space-x-2">
+                                    <button @click="deleteThread(selectedThread)" class="text-red-400 hover:text-red-300 text-sm">
+                                        Delete Thread
+                                    </button>
+                                    <button @click="lockThread(selectedThread)" class="text-yellow-400 hover:text-yellow-300 text-sm">
+                                        <span x-text="selectedThread.locked ? 'Unlock' : 'Lock'"></span> Thread
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                        <h1 class="text-2xl font-bold text-white mb-4" x-text="selectedThread.title"></h1>
+                        <div class="flex items-center space-x-4 text-sm text-gray-400">
+                            <span class="flex items-center space-x-1">
+                                <div class="w-4 h-4 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer"
+                                     @mouseenter="showMiniProfile(selectedThread.author, $event)"
+                                     @mouseleave="hideMiniProfile"
+                                     :style="getUserProfilePicture(selectedThread.author) ? `background-image: url(${getUserProfilePicture(selectedThread.author)}); background-size: cover; background-position: center;` : ''">
+                                    <span x-show="!getUserProfilePicture(selectedThread.author)" class="text-white text-xs" x-text="selectedThread.author.charAt(0).toUpperCase()"></span>
+                                </div>
+                                <span class="cursor-pointer hover:text-blue-400" 
+                                      @mouseenter="showMiniProfile(selectedThread.author, $event)"
+                                      @mouseleave="hideMiniProfile"
+                                      x-text="selectedThread.author"></span>
+                            </span>
+                            <span x-text="formatDate(selectedThread.createdAt)"></span>
+                            <span>Views: <span x-text="selectedThread.views"></span></span>
+                            <template x-if="selectedThread.locked">
+                                <span class="px-2 py-1 bg-yellow-900 text-yellow-200 rounded-full text-xs">Locked</span>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Thread Content -->
+                    <div class="mb-8">
+                        <div class="text-gray-300 whitespace-pre-wrap" x-text="selectedThread.content"></div>
+                        <!-- Thread Attachments -->
+                        <template x-if="selectedThread.attachments && selectedThread.attachments.length > 0">
+                            <div class="mt-4 flex flex-wrap">
+                                <template x-for="file in selectedThread.attachments" :key="file.id">
+                                    <div @click="previewFile(file)" class="file-attachment">
+                                        <template x-if="file.type.startsWith('image/')">
+                                            <img :src="file.data" :alt="file.name" class="file-attachment-image">
+                                        </template>
+                                        <template x-if="file.type.startsWith('video/')">
+                                            <video :src="file.data" class="file-attachment-video" controls></video>
+                                        </template>
+                                        <template x-if="!file.type.startsWith('image/') && !file.type.startsWith('video/')">
+                                            <span class="text-xs">📎 <span x-text="file.name"></span></span>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Replies Section -->
+                    <div class="border-t border-gray-800 pt-6">
+                        <h3 class="text-lg font-semibold text-white mb-4">Replies (<span x-text="selectedThread.replies.length"></span>)</h3>
+                        
+                        <div class="space-y-4 mb-6">
+                            <template x-for="reply in selectedThread.replies" :key="reply.id">
+                                <div class="border-l-2 border-gray-700 pl-4">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center cursor-pointer"
+                                             @mouseenter="showMiniProfile(reply.author, $event)"
+                                             @mouseleave="hideMiniProfile"
+                                             :style="getUserProfilePicture(reply.author) ? `background-image: url(${getUserProfilePicture(reply.author)}); background-size: cover; background-position: center;` : ''">
+                                            <span x-show="!getUserProfilePicture(reply.author)" class="text-white text-xs" x-text="reply.author.charAt(0).toUpperCase()"></span>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="flex items-center space-x-2 mb-2">
+                                                <span class="text-sm font-medium text-white cursor-pointer hover:text-blue-400" 
+                                                      @mouseenter="showMiniProfile(reply.author, $event)"
+                                                      @mouseleave="hideMiniProfile"
+                                                      x-text="reply.author"></span>
+                                                <span class="text-xs text-gray-500" x-text="formatDate(reply.timestamp)"></span>
+                                                <template x-if="(currentUser.role === 'Admin' || currentUser.role === 'Owner') && reply.author !== currentUser.username">
+                                                    <button @click="deleteReply(selectedThread, reply)" class="text-red-400 hover:text-red-300 text-xs">
+                                                        Delete
+                                                    </button>
+                                                </template>
+                                            </div>
+                                            <div class="text-gray-300 text-sm" x-text="reply.content"></div>
+                                            <!-- Reply Attachments -->
+                                            <template x-if="reply.attachments && reply.attachments.length > 0">
+                                                <div class="mt-2 flex flex-wrap">
+                                                    <template x-for="file in reply.attachments" :key="file.id">
+                                                        <div @click="previewFile(file)" class="file-attachment">
+                                                            <template x-if="file.type.startsWith('image/')">
+                                                                <img :src="file.data" :alt="file.name" class="file-attachment-image">
+                                                            </template>
+                                                            <template x-if="file.type.startsWith('video/')">
+                                                                <video :src="file.data" class="file-attachment-video" controls></video>
+                                                            </template>
+                                                            <template x-if="!file.type.startsWith('image/') && !file.type.startsWith('video/')">
+                                                                <span class="text-xs">📎 <span x-text="file.name"></span></span>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Reply Form -->
+                        <template x-if="isAuthenticated && !selectedThread.locked">
+                            <div class="space-y-2">
+                                <!-- File Attachments Preview -->
+                                <template x-if="threadAttachments.length > 0">
+                                    <div class="flex flex-wrap items-center space-x-2 p-2 bg-gray-900 rounded">
+                                        <template x-for="file in threadAttachments" :key="file.id">
+                                            <div class="relative">
+                                                <template x-if="file.type.startsWith('image/')">
+                                                    <img :src="file.data" :alt="file.name" class="w-12 h-12 object-cover rounded">
+                                                </template>
+                                                <template x-else>
+                                                    <span class="text-xs bg-gray-800 px-2 py-1 rounded">📎 <span x-text="file.name.substring(0, 10) + '...'"></span></span>
+                                                </template>
+                                                <button @click="threadAttachments = threadAttachments.filter(f => f.id !== file.id)" 
+                                                        class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs">✕</button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                                
+                                <div class="space-y-2">
+                                    <textarea x-model="newThreadReply" placeholder="Write your reply..." 
+                                              class="input-dark w-full h-24 resize-none"></textarea>
+                                    <div class="flex space-x-2">
+                                        <div class="file-input-wrapper">
+                                            <label class="file-input-label">
+                                                📎 Attach File
+                                                <input type="file" multiple @change="handleThreadFileUpload($event)">
+                                            </label>
+                                        </div>
+                                        <button @click="postReply" class="btn-primary-dark">Post Reply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="selectedThread.locked">
+                            <div class="text-center py-4 text-yellow-400">
+                                This thread is locked
+                            </div>
+                        </template>
+                        <template x-if="!isAuthenticated">
+                            <div class="text-center py-4">
+                                <button @click="showLoginModal = true" class="btn-primary-dark">Sign in to reply</button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- Profile View -->
+        <div x-show="currentView === 'profile'" x-cloak class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="card-dark">
+                <!-- Profile Banner and PFP -->
+                <div class="relative">
+                    <div class="profile-banner" :style="currentUser.profileBanner ? `background-image: url(${currentUser.profileBanner})` : ''">
+                        <div class="profile-pfp" :style="currentUser.profilePicture ? `background-image: url(${currentUser.profilePicture}); background-size: cover; background-position: center;` : ''">
+                            <span x-show="!currentUser.profilePicture" class="text-white text-2xl font-medium" x-text="currentUser.username.charAt(0).toUpperCase()"></span>
+                        </div>
+                    </div>
+                    <div class="pt-12 pb-6">
+                        <div class="flex items-end justify-between">
+                            <div>
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <h3 class="text-xl font-semibold text-white" x-text="currentUser.username"></h3>
+                                    <template x-for="badge in currentUser.badges" :key="badge">
+                                        <span class="badge" :class="'badge-' + badge.toLowerCase().replace(' ', '')" x-text="badge"></span>
+                                    </template>
+                                </div>
+                                <p class="text-sm text-gray-400">
+                                    <span x-text="currentUser.role"></span> • Level <span x-text="currentUser.level"></span>
+                                </p>
+                                <p class="text-sm text-gray-500"><span x-text="currentUser.xp"></span> XP</p>
+                            </div>
+                            <button @click="showProfileEditModal = true" class="btn-primary-dark">
+                                Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="text-center p-4 bg-gray-900 rounded-lg">
+                        <div class="text-2xl font-bold text-white" x-text="currentUser.level"></div>
+                        <div class="text-sm text-gray-400">Level</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-900 rounded-lg">
+                        <div class="text-2xl font-bold text-white" x-text="currentUser.xp"></div>
+                        <div class="text-sm text-gray-400">Total XP</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-900 rounded-lg">
+                        <div class="text-2xl font-bold text-white" x-text="forumThreads.filter(t => t.author === currentUser.username).length"></div>
+                        <div class="text-sm text-gray-400">Threads</div>
+                    </div>
+                    <div class="text-center p-4 bg-gray-900 rounded-lg">
+                        <div class="text-2xl font-bold text-white" x-text="chatMessages.filter(m => m.author === currentUser.username).length"></div>
+                        <div class="text-sm text-gray-400">Messages</div>
+                    </div>
+                </div>
+
+                <!-- Daily XP Progress -->
+                <div class="bg-gray-900 rounded-lg p-4">
+                    <h4 class="text-sm font-medium text-gray-300 mb-2">Daily XP Progress</h4>
+                    <div class="w-full bg-gray-800 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" :style="`width: ${Math.min((currentUser.dailyXP[new Date().toDateString()] || 0) / 100 * 100, 100)}%`"></div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        <span x-text="currentUser.dailyXP[new Date().toDateString()] || 0"></span> / 100 XP today
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin View -->
+        <div x-show="currentView === 'admin'" x-cloak class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="card-dark">
+                <h2 class="text-2xl font-bold text-white mb-6">🛡️ Admin Panel</h2>
+                
+                <!-- Owner Panel -->
+                <template x-if="currentUser.role === 'Owner'">
+                    <div class="mb-8 p-4 bg-yellow-900 border border-yellow-700 rounded-lg">
+                        <h3 class="text-lg font-semibold text-yellow-200 mb-4">👑 Owner Controls</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-yellow-200 mb-2">Chat Cooldown (seconds)</label>
+                                <input x-model="adminSettings.chatCooldown" type="number" min="0" class="input-dark">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-yellow-200 mb-2">Thread Cooldown (seconds)</label>
+                                <input x-model="adminSettings.threadCooldown" type="number" min="0" class="input-dark">
+                            </div>
+                        </div>
+                        <div class="mt-4 flex space-x-4">
+                            <label class="flex items-center">
+                                <input x-model="adminSettings.lockdownChat" type="checkbox" class="mr-2">
+                                <span class="text-yellow-200">Lockdown Chat</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input x-model="adminSettings.lockdownThreads" type="checkbox" class="mr-2">
+                                <span class="text-yellow-200">Lockdown Threads</span>
+                            </label>
+                        </div>
+                        <button @click="saveAdminSettings" class="btn-primary-dark mt-4">Save Settings</button>
+                    </div>
+                </template>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Badge Management -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-4">Badge Management</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Select User</label>
+                                <select x-model="selectedUserForBadge" class="input-dark">
+                                    <option value="">Choose user...</option>
+                                    <template x-for="user in allUsers" :key="user.id">
+                                        <option :value="user.id" x-text="`${user.username} (${user.role})`"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Award Badge</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button @click="awardBadge('Owner')" class="btn-dark text-sm" x-show="currentUser.role === 'Owner'">Owner</button>
+                                    <button @click="awardBadge('Admin')" class="btn-dark text-sm">Admin</button>
+                                    <button @click="awardBadge('Leader')" class="btn-dark text-sm">Leader</button>
+                                    <button @click="awardBadge('Co-Leader')" class="btn-dark text-sm">Co-Leader</button>
+                                    <button @click="awardBadge('Official Member')" class="btn-dark text-sm">Official Member</button>
+                                    <button @click="awardBadge('Veteran')" class="btn-dark text-sm">Veteran</button>
+                                    <button @click="awardBadge('Elite')" class="btn-dark text-sm">Elite</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Management -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-4">User Management</h3>
+                        <div class="space-y-2 max-h-64 overflow-y-auto">
+                            <template x-for="user in allUsers" :key="user.id">
+                                <div class="flex items-center justify-between p-2 bg-gray-900 rounded">
+                                    <div>
+                                        <span class="text-sm font-medium text-white" x-text="user.username"></span>
+                                        <span class="text-xs text-gray-400 ml-2" x-text="`Level ${user.level}`"></span>
+                                        <span x-show="bannedUsers.includes(user.id)" class="text-xs text-red-400 ml-2">BANNED</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <template x-for="badge in user.badges" :key="badge">
+                                            <span class="badge text-xs" :class="'badge-' + badge.toLowerCase().replace(' ', '')" x-text="badge"></span>
+                                        </template>
+                                        <template x-if="currentUser.role === 'Owner' && user.id !== currentUser.id">
+                                            <button @click="banUser(user)" class="text-red-400 hover:text-red-300 text-xs">
+                                                <span x-text="bannedUsers.includes(user.id) ? 'Unban' : 'Ban'"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Moderation -->
+                <template x-if="currentUser.role === 'Admin' || currentUser.role === 'Owner'">
+                    <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Delete Chat Messages -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-white mb-4">Chat Moderation</h3>
+                            <div class="space-y-2 max-h-64 overflow-y-auto">
+                                <template x-for="message in chatMessages" :key="message.id">
+                                    <div class="flex items-center justify-between p-2 bg-gray-900 rounded">
+                                        <div class="flex-1">
+                                            <span class="text-sm font-medium text-white" x-text="message.author"></span>
+                                            <span class="text-xs text-gray-400 ml-2" x-text="formatDate(message.timestamp)"></span>
+                                            <p class="text-xs text-gray-300 mt-1" x-text="message.content"></p>
+                                        </div>
+                                        <button @click="deleteChatMessage(message)" class="text-red-400 hover:text-red-300 text-xs">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Delete Threads -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-white mb-4">Thread Moderation</h3>
+                            <div class="space-y-2 max-h-64 overflow-y-auto">
+                                <template x-for="thread in forumThreads" :key="thread.id">
+                                    <div class="flex items-center justify-between p-2 bg-gray-900 rounded">
+                                        <div class="flex-1">
+                                            <span class="text-sm font-medium text-white" x-text="thread.title"></span>
+                                            <span class="text-xs text-gray-400 ml-2" x-text="thread.author"></span>
+                                        </div>
+                                        <button @click="deleteThreadFromAdmin(thread)" class="text-red-400 hover:text-red-300 text-xs">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </main>
+
+    <!-- File Preview Modal -->
+    <div x-show="filePreview" x-cloak class="file-preview-modal" @click.self="filePreview = null">
+        <div class="relative">
+            <button @click="filePreview = null" class="absolute top-4 right-4 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center z-10">
+                ✕
+            </button>
+            <template x-if="filePreview">
+                <template x-if="filePreview.type.startsWith('image/')">
+                    <img :src="filePreview.data" :alt="filePreview.name" class="file-preview-content">
+                </template>
+                <template x-if="filePreview.type.startsWith('video/')">
+                    <video :src="filePreview.data" controls class="file-preview-content"></video>
+                </template>
+                <template x-if="!filePreview.type.startsWith('image/') && !filePreview.type.startsWith('video/')">
+                    <div class="file-preview-content bg-gray-900 p-8 text-center">
+                        <h3 class="text-xl font-bold text-white mb-4" x-text="filePreview.name"></h3>
+                        <p class="text-gray-400 mb-4">File size: <span x-text="Math.round(filePreview.size / 1024) + ' KB'"></span></p>
+                        <a :href="filePreview.data" :download="filePreview.name" class="btn-primary-dark">
+                            Download File
+                        </a>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <!-- Login Modal -->
+    <div x-show="showLoginModal" x-cloak class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" @click.self="showLoginModal = false">
+        <div class="card-dark max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Sign In</h3>
+            <form @submit.prevent="login">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                        <input x-model="loginForm.email" type="email" required class="input-dark">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                        <input x-model="loginForm.password" type="password" required class="input-dark">
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button type="submit" class="btn-primary-dark w-full">Sign In</button>
+                </div>
+                <div class="mt-4 text-center">
+                    <button type="button" @click="showLoginModal = false; showSignupModal = true" class="text-gray-400 hover:text-white text-sm">
+                        Don't have an account? Sign Up
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div x-show="showSignupModal" x-cloak class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" @click.self="showSignupModal = false">
+        <div class="card-dark max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Sign Up</h3>
+            <form @submit.prevent="signup">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                        <input x-model="signupForm.username" type="text" required class="input-dark">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                        <input x-model="signupForm.email" type="email" required class="input-dark">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                        <input x-model="signupForm.password" type="password" required class="input-dark">
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <button type="submit" class="btn-primary-dark w-full">Sign Up</button>
+                </div>
+                <div class="mt-4 text-center">
+                    <button type="button" @click="showSignupModal = false; showLoginModal = true" class="text-gray-400 hover:text-white text-sm">
+                        Already have an account? Sign In
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Edit Modal -->
+    <div x-show="showProfileEditModal" x-cloak class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" @click.self="showProfileEditModal = false">
+        <div class="card-dark max-w-2xl w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Edit Profile</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Profile Picture</label>
+                    <input type="file" @change="handleProfilePictureUpload" accept="image/*,.gif" class="input-dark">
+                    <div x-show="profileEditForm.profilePicture" class="mt-2">
+                        <img :src="profileEditForm.profilePicture" class="w-20 h-20 rounded-full object-cover">
+                        <p class="text-xs text-green-400 mt-1">✓ Image loaded successfully</p>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Profile Banner</label>
+                    <input type="file" @change="handleProfileBannerUpload" accept="image/*,.gif" class="input-dark">
+                    <div x-show="profileEditForm.profileBanner" class="mt-2">
+                        <img :src="profileEditForm.profileBanner" class="w-full h-32 rounded-lg object-cover">
+                        <p class="text-xs text-green-400 mt-1">✓ Banner loaded successfully</p>
+                    </div>
+                </div>
+            </div>
+                <div class="mt-6 space-y-3">
+                    <button type="button" @click="updateProfile" class="btn-primary-dark w-full">Save Changes</button>
+                    <button type="button" @click="testProfileUpdate" class="btn-dark w-full text-sm">Test Update (Debug)</button>
+                    <button type="button" @click="showProfileEditModal = false" class="btn-dark w-full">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Thread Modal -->
+    <div x-show="showNewThreadModal" x-cloak class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" @click.self="showNewThreadModal = false">
+        <div class="card-dark max-w-2xl w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Create New Thread</h3>
+            <form @submit.prevent="createThread">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Title</label>
+                        <input x-model="newThread.title" type="text" required class="input-dark">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Content</label>
+                        <textarea x-model="newThread.content" required class="input-dark h-32 resize-none"></textarea>
+                    </div>
+                    <!-- File Attachments Preview -->
+                    <template x-if="threadAttachments.length > 0">
+                        <div class="flex flex-wrap items-center space-x-2 p-2 bg-gray-900 rounded">
+                            <template x-for="file in threadAttachments" :key="file.id">
+                                <div class="relative">
+                                    <template x-if="file.type.startsWith('image/')">
+                                        <img :src="file.data" :alt="file.name" class="w-12 h-12 object-cover rounded">
+                                    </template>
+                                    <template x-else>
+                                        <span class="text-xs bg-gray-800 px-2 py-1 rounded">📎 <span x-text="file.name.substring(0, 10) + '...'"></span></span>
+                                    </template>
+                                    <button @click="threadAttachments = threadAttachments.filter(f => f.id !== file.id)" 
+                                            class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-xs">✕</button>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                    <div class="flex space-x-2">
+                        <div class="file-input-wrapper">
+                            <label class="file-input-label">
+                                📎 Attach Files
+                                <input type="file" multiple @change="handleThreadFileUpload($event)">
+                            </label>
+                        </div>
+                        <div class="flex-1"></div>
+                        <button type="button" @click="showNewThreadModal = false" class="btn-dark">Cancel</button>
+                        <button type="submit" class="btn-primary-dark">Create Thread</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- New Ticket Modal -->
+    <div x-show="showNewTicketModal" x-cloak class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50" @click.self="showNewTicketModal = false">
+        <div class="card-dark max-w-2xl w-full mx-4">
+            <h3 class="text-2xl font-bold text-white mb-6">Open Recruitment Ticket</h3>
+            <form @submit.prevent="createTicket">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Title</label>
+                        <input x-model="newTicket.title" type="text" required class="input-dark">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                        <select x-model="newTicket.category" class="input-dark">
+                            <option value="recruitment">Recruitment</option>
+                            <option value="support">Support</option>
+                            <option value="general">General</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Message</label>
+                        <textarea x-model="newTicket.content" rows="6" required class="input-dark"></textarea>
+                    </div>
+                </div>
+                <div class="mt-6 flex space-x-3">
+                    <button type="submit" class="btn-primary-dark flex-1">Open Ticket</button>
+                    <button type="button" @click="showNewTicketModal = false" class="btn-dark flex-1">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mini Profile Tooltip -->
+    <div x-show="showUserMiniProfile" x-cloak 
+         :style="`position: fixed; left: ${miniProfilePosition.x}px; top: ${miniProfilePosition.y}px; z-index: 1000;`"
+         @mouseenter="showUserMiniProfile = true"
+         @mouseleave="hideMiniProfile"
+         class="card-dark p-4 shadow-xl">
+        <template x-if="miniProfileUser">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center"
+                     :style="miniProfileUser.profilePicture ? `background-image: url(${miniProfileUser.profilePicture}); background-size: cover;` : ''">
+                    <span x-show="!miniProfileUser.profilePicture" class="text-white text-lg" x-text="miniProfileUser.username.charAt(0).toUpperCase()"></span>
+                </div>
+                <div>
+                    <div class="font-semibold text-white" x-text="miniProfileUser.username"></div>
+                    <div class="text-sm text-gray-400">
+                        Level <span x-text="miniProfileUser.level"></span> • <span x-text="miniProfileUser.role"></span>
+                    </div>
+                    <div class="text-xs text-gray-500">
+                        <span x-text="miniProfileUser.xp"></span> XP
+                    </div>
+                    <div class="flex items-center space-x-1 mt-1">
+                        <template x-for="badge in miniProfileUser.badges" :key="badge">
+                            <span class="badge text-xs" :class="'badge-' + badge.toLowerCase().replace(' ', '')" x-text="badge"></span>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <div class="notification-container fixed top-4 right-4 z-50 space-y-2">
+            <template x-for="notification in notifications" :key="notification.id">
+                <div class="notification" 
+                     :class="'notification-' + notification.type"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="transform translate-x-full opacity-0"
+                     x-transition:enter-end="transform translate-x-0 opacity-100"
+                     x-transition:leave="transition ease-in duration-300"
+                     x-transition:leave-start="transform translate-x-0 opacity-100"
+                     x-transition:leave-end="transform translate-x-full opacity-0">
+                    <div class="flex items-center justify-between">
+                        <span x-text="notification.message"></span>
+                        <button @click="notifications = notifications.filter(n => n.id !== notification.id)" 
+                                class="ml-4 text-white hover:text-gray-200">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <script>
+        function valandWaffenApp() {
+            return {
+                currentView: 'home',
+                isAuthenticated: false,
+                currentUser: null,
+                showLoginModal: false,
+                showNewThreadModal: false,
+                showNewTicketModal: false,
+                showProfileEditModal: false,
+                showUserMenu: false,
+                showSignupModal: false,
+                selectedUserForBadge: '',
+                loginForm: { email: '', password: '' },
+                signupForm: { username: '', email: '', password: '' },
+                newThread: { title: '', content: '' },
+                newTicket: { title: '', category: 'recruitment', content: '' },
+                profileEditForm: { profilePicture: '', profileBanner: '' },
+                newChatMessage: '',
+                forumThreads: [],
+                chatMessages: [],
+                userTickets: [],
+                allUsers: [],
+                friends: [],
+                friendRequests: [],
+                privateMessages: [],
+                showUserMiniProfile: false,
+                miniProfileUser: null,
+                miniProfilePosition: { x: 0, y: 0 },
+                showPrivateChat: false,
+                privateChatUser: null,
+                newPrivateMessage: '',
+                userSearchQuery: '',
+                searchedUsers: [],
+                selectedThread: null,
+                newThreadReply: '',
+                adminSettings: {
+                    chatCooldown: 0,
+                    threadCooldown: 0,
+                    lockdownChat: false,
+                    lockdownThreads: false
+                },
+                bannedUsers: [],
+                selectedConversation: null,
+                newMessage: '',
+                viewedUser: null,
+                selectedTicket: null,
+                newTicketMessage: '',
+                notifications: [],
+                chatAttachments: [],
+                threadAttachments: [],
+                ticketAttachments: [],
+                filePreview: null,
+
+                init() {
+                    this.loadData();
+                    this.checkAuth();
+                    this.initializeSampleData();
+                    this.createSparkles();
+                    this.trackTimeOnSite();
+                },
+
+                createSparkles() {
+                    const sparklesContainer = document.getElementById('sparkles');
+                    setInterval(() => {
+                        if (sparklesContainer.children.length < 15) {
+                            const sparkle = document.createElement('div');
+                            sparkle.className = 'sparkle';
+                            sparkle.style.left = Math.random() * 100 + '%';
+                            sparkle.style.width = sparkle.style.height = Math.random() * 3 + 1 + 'px';
+                            sparkle.style.animationDelay = Math.random() * 3 + 's';
+                            sparkle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                            sparklesContainer.appendChild(sparkle);
+                            
+                            setTimeout(() => sparkle.remove(), 5000);
+                        }
+                    }, 300);
+                },
+
+                trackTimeOnSite() {
+                    setInterval(() => {
+                        if (this.isAuthenticated) {
+                            this.addXP(1, 'time_on_site');
+                        }
+                    }, 60000); // 1 XP per minute
+                },
+
+                loadData() {
+                    const savedData = localStorage.getItem('valandwaffen_data');
+                    if (savedData) {
+                        const data = JSON.parse(savedData);
+                        this.forumThreads = data.forumThreads || [];
+                        this.chatMessages = data.chatMessages || [];
+                        this.userTickets = data.userTickets || [];
+                        this.friends = data.friends || [];
+                        this.friendRequests = data.friendRequests || [];
+                        this.privateMessages = data.privateMessages || [];
+                        this.adminSettings = data.adminSettings || {
+                            chatCooldown: 0,
+                            threadCooldown: 0,
+                            lockdownChat: false,
+                            lockdownThreads: false
+                        };
+                        this.bannedUsers = data.bannedUsers || [];
+                    }
+                    
+                    // Load all users for admin panel
+                    this.allUsers = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                },
+
+                saveData() {
+                    const data = {
+                        forumThreads: this.forumThreads,
+                        chatMessages: this.chatMessages,
+                        userTickets: this.userTickets,
+                        friends: this.friends,
+                        friendRequests: this.friendRequests,
+                        privateMessages: this.privateMessages,
+                        adminSettings: this.adminSettings,
+                        bannedUsers: this.bannedUsers
+                    };
+                    localStorage.setItem('valandwaffen_data', JSON.stringify(data));
+                },
+
+                checkAuth() {
+                    const savedUser = localStorage.getItem('valandwaffen_user');
+                    if (savedUser) {
+                        this.currentUser = JSON.parse(savedUser);
+                        this.isAuthenticated = true;
+                        
+                        // Sync with latest user data from users array
+                        const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                        const latestUserData = users.find(u => u.id === this.currentUser.id);
+                        if (latestUserData) {
+                            // Update current user with latest data including profile pictures/banners
+                            this.currentUser = { ...this.currentUser, ...latestUserData };
+                            localStorage.setItem('valandwaffen_user', JSON.stringify(this.currentUser));
+                            console.log('Updated currentUser with latest data:', this.currentUser);
+                        }
+                    }
+                },
+
+                login() {
+                    const hashPassword = (password) => btoa(password + 'salt');
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    
+                    const user = users.find(u => 
+                        u.email === this.loginForm.email && 
+                        u.password === hashPassword(this.loginForm.password)
+                    );
+
+                    if (user) {
+                        this.currentUser = user;
+                        this.isAuthenticated = true;
+                        localStorage.setItem('valandwaffen_user', JSON.stringify(user));
+                        this.showLoginModal = false;
+                        this.loginForm = { email: '', password: '' };
+                        
+                        // Award daily login XP
+                        this.addXP(10, 'daily_login');
+                    } else {
+                        this.showNotification('Invalid email or password', 'error');
+                    }
+                },
+
+                signup() {
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    
+                    // Check if email already exists
+                    if (users.find(u => u.email === this.signupForm.email)) {
+                        this.showNotification('Email already exists', 'error');
+                        return;
+                    }
+                    
+                    // Check if username already exists
+                    if (users.find(u => u.username === this.signupForm.username)) {
+                        this.showNotification('Username already exists', 'error');
+                        return;
+                    }
+                    
+                    const newUser = {
+                        id: Date.now(),
+                        username: this.signupForm.username,
+                        email: this.signupForm.email,
+                        password: btoa(this.signupForm.password + 'salt'),
+                        role: 'Member',
+                        badges: [],
+                        xp: 0,
+                        level: 1,
+                        dailyXP: {},
+                        profilePicture: '',
+                        profileBanner: '',
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    users.push(newUser);
+                    localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                    
+                    // Auto-login after signup
+                    this.currentUser = newUser;
+                    this.isAuthenticated = true;
+                    localStorage.setItem('valandwaffen_user', JSON.stringify(newUser));
+                    this.showSignupModal = false;
+                    this.signupForm = { username: '', email: '', password: '' };
+                    
+                    this.showNotification('Account created successfully!', 'success');
+                },
+
+                logout() {
+                    this.currentUser = null;
+                    this.isAuthenticated = false;
+                    localStorage.removeItem('valandwaffen_user');
+                    this.currentView = 'home';
+                },
+
+                goToProfile() {
+                    // Refresh current user data before going to profile
+                    this.refreshCurrentUserData();
+                    this.currentView = 'profile';
+                },
+
+                refreshCurrentUserData() {
+                    if (!this.isAuthenticated) return;
+                    
+                    // Get latest user data from users array
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const latestUserData = users.find(u => u.id === this.currentUser.id);
+                    if (latestUserData) {
+                        this.currentUser = { ...this.currentUser, ...latestUserData };
+                        localStorage.setItem('valandwaffen_user', JSON.stringify(this.currentUser));
+                        console.log('Refreshed currentUser data:', this.currentUser);
+                    }
+                    
+                    // Also refresh allUsers array
+                    this.allUsers = users;
+                },
+
+                testProfileUpdate() {
+                    console.log('=== TEST PROFILE UPDATE ===');
+                    console.log('profileEditForm contents:', this.profileEditForm);
+                    console.log('profileEditForm.profilePicture exists:', !!this.profileEditForm.profilePicture);
+                    console.log('profileEditForm.profileBanner exists:', !!this.profileEditForm.profileBanner);
+                    
+                    if (this.profileEditForm.profilePicture) {
+                        console.log('Profile picture length:', this.profileEditForm.profilePicture.length);
+                        console.log('Profile picture type:', typeof this.profileEditForm.profilePicture);
+                    }
+                    
+                    if (this.profileEditForm.profileBanner) {
+                        console.log('Profile banner length:', this.profileEditForm.profileBanner.length);
+                        console.log('Profile banner type:', typeof this.profileEditForm.profileBanner);
+                    }
+                    
+                    // Try to call updateProfile manually
+                    console.log('Calling updateProfile manually...');
+                    this.updateProfile();
+                },
+
+                updateProfile() {
+                    console.log('=== UPDATE PROFILE FUNCTION CALLED ===');
+                    console.log('profileEditForm:', this.profileEditForm);
+                    console.log('currentUser before update:', this.currentUser);
+                    
+                    // Check if form has any data
+                    if (!this.profileEditForm.profilePicture && !this.profileEditForm.profileBanner) {
+                        console.log('No changes to save - form is empty');
+                        this.showNotification('No changes to save', 'info');
+                        return;
+                    }
+                    
+                    if (this.profileEditForm.profilePicture) {
+                        this.currentUser.profilePicture = this.profileEditForm.profilePicture;
+                        console.log('Updated profile picture, length:', this.currentUser.profilePicture.length);
+                    }
+                    if (this.profileEditForm.profileBanner) {
+                        this.currentUser.profileBanner = this.profileEditForm.profileBanner;
+                        console.log('Updated profile banner, length:', this.currentUser.profileBanner.length);
+                    }
+                    
+                    // Update in users array
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === this.currentUser.id);
+                    if (userIndex !== -1) {
+                        users[userIndex].profilePicture = this.currentUser.profilePicture;
+                        users[userIndex].profileBanner = this.currentUser.profileBanner;
+                        localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                        console.log('Saved to users array, index:', userIndex);
+                    } else {
+                        console.error('User not found in users array!');
+                    }
+                    
+                    // Update allUsers array
+                    const allUsersIndex = this.allUsers.findIndex(u => u.id === this.currentUser.id);
+                    if (allUsersIndex !== -1) {
+                        this.allUsers[allUsersIndex].profilePicture = this.currentUser.profilePicture;
+                        this.allUsers[allUsersIndex].profileBanner = this.currentUser.profileBanner;
+                        console.log('Updated allUsers array, index:', allUsersIndex);
+                    }
+                    
+                    localStorage.setItem('valandwaffen_user', JSON.stringify(this.currentUser));
+                    this.saveData(); // Save all application data
+                    this.showProfileEditModal = false;
+                    this.profileEditForm = { profilePicture: '', profileBanner: '' };
+                    this.showNotification('Profile updated successfully!', 'success');
+                    
+                    console.log('=== PROFILE UPDATE COMPLETE ===');
+                    console.log('Final currentUser state:', this.currentUser);
+                },
+
+                awardBadge(badgeType) {
+                    if (!this.selectedUserForBadge) {
+                        this.showNotification('Please select a user first', 'error');
+                        return;
+                    }
+                    
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === parseInt(this.selectedUserForBadge));
+                    
+                    if (userIndex !== -1) {
+                        if (!users[userIndex].badges.includes(badgeType)) {
+                            users[userIndex].badges.push(badgeType);
+                            localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                            this.allUsers = users;
+                            this.showNotification(`Awarded ${badgeType} badge to ${users[userIndex].username}`, 'success');
+                        } else {
+                            this.showNotification('User already has this badge', 'error');
+                        }
+                    }
+                },
+
+                createThread() {
+                    if (!this.canPostThread()) {
+                        this.showNotification('You cannot create threads at this time.', 'error');
+                        return;
+                    }
+                    
+                    const thread = {
+                        id: Date.now(),
+                        title: this.newThread.title,
+                        content: this.newThread.content,
+                        author: this.currentUser.username,
+                        replies: [],
+                        views: 0,
+                        locked: false,
+                        createdAt: new Date().toISOString(),
+                        attachments: [...this.threadAttachments]
+                    };
+
+                    this.forumThreads.unshift(thread);
+                    this.saveData();
+                    this.showNewThreadModal = false;
+                    this.newThread = { title: '', content: '' };
+                    this.threadAttachments = [];
+                    
+                    this.addXP(25, 'thread_created');
+                },
+
+                createTicket() {
+                    const ticket = {
+                        id: Date.now(),
+                        title: this.newTicket.title,
+                        category: this.newTicket.category,
+                        createdBy: this.currentUser.username,
+                        status: 'open',
+                        createdAt: new Date().toISOString(),
+                        messages: [{
+                            id: Date.now(),
+                            author: this.currentUser.username,
+                            role: this.currentUser.role,
+                            content: this.newTicket.content,
+                            timestamp: new Date().toISOString()
+                        }]
+                    };
+
+                    this.userTickets.unshift(ticket);
+                    this.saveData();
+                    this.showNewTicketModal = false;
+                    this.newTicket = { title: '', category: 'recruitment', content: '' };
+                    
+                    this.addXP(15, 'ticket_created');
+                    this.showNotification('Ticket created successfully!', 'success');
+                },
+
+                openTicket(ticket) {
+                    this.selectedTicket = ticket;
+                    this.currentView = 'ticketChat';
+                    this.newTicketMessage = '';
+                },
+
+                sendTicketMessage() {
+                    if (!this.newTicketMessage.trim() && this.ticketAttachments.length === 0) return;
+                    if (!this.selectedTicket) return;
+                    
+                    const message = {
+                        id: Date.now(),
+                        author: this.currentUser.username,
+                        role: this.currentUser.role,
+                        content: this.newTicketMessage,
+                        timestamp: new Date().toISOString(),
+                        attachments: [...this.ticketAttachments]
+                    };
+                    
+                    this.selectedTicket.messages.push(message);
+                    this.saveData();
+                    this.newTicketMessage = '';
+                    this.ticketAttachments = [];
+                },
+
+                deleteTicketMessage(message) {
+                    if (confirm('Delete this message?')) {
+                        this.selectedTicket.messages = this.selectedTicket.messages.filter(m => m.id !== message.id);
+                        this.saveData();
+                    }
+                },
+
+                lockTicket(ticket) {
+                    ticket.status = ticket.status === 'locked' ? 'open' : 'locked';
+                    this.saveData();
+                    this.showNotification(ticket.status === 'locked' ? 'Ticket locked' : 'Ticket unlocked', 'info');
+                },
+
+                deleteTicket(ticket) {
+                    if (confirm('Delete this ticket? This action cannot be undone.')) {
+                        this.userTickets = this.userTickets.filter(t => t.id !== ticket.id);
+                        this.saveData();
+                        this.currentView = 'tickets';
+                        this.selectedTicket = null;
+                        this.showNotification('Ticket deleted', 'info');
+                    }
+                },
+
+                canAccessTicket(ticket) {
+                    if (!this.isAuthenticated) return false;
+                    if (this.currentUser.role === 'Admin' || this.currentUser.role === 'Owner') return true;
+                    return ticket.createdBy === this.currentUser.username;
+                },
+
+                sendChatMessage() {
+                    if (!this.newChatMessage.trim() && this.chatAttachments.length === 0) return;
+                    if (!this.canPostChat()) return;
+
+                    const message = {
+                        id: Date.now(),
+                        author: this.currentUser.username,
+                        content: this.newChatMessage,
+                        timestamp: new Date().toISOString(),
+                        attachments: [...this.chatAttachments]
+                    };
+
+                    this.chatMessages.push(message);
+                    this.saveData();
+                    this.newChatMessage = '';
+                    this.chatAttachments = [];
+                    
+                    if (this.chatMessages.length > 50) {
+                        this.chatMessages = this.chatMessages.slice(-50);
+                    }
+                    
+                    this.addXP(2, 'chat_message');
+                },
+
+                handleChatFileUpload(event) {
+                    const files = Array.from(event.target.files);
+                    files.forEach(file => this.processFile(file, 'chat'));
+                },
+
+                handleThreadFileUpload(event) {
+                    const files = Array.from(event.target.files);
+                    files.forEach(file => this.processFile(file, 'thread'));
+                },
+
+                handleTicketFileUpload(event) {
+                    const files = Array.from(event.target.files);
+                    files.forEach(file => this.processFile(file, 'ticket'));
+                },
+
+                processFile(file, context) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const fileData = {
+                            id: Date.now() + Math.random(),
+                            name: file.name,
+                            type: file.type,
+                            size: file.size,
+                            data: e.target.result
+                        };
+
+                        if (context === 'chat') {
+                            this.chatAttachments.push(fileData);
+                        } else if (context === 'thread') {
+                            this.threadAttachments.push(fileData);
+                        } else if (context === 'ticket') {
+                            this.ticketAttachments.push(fileData);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                },
+
+                previewFile(file) {
+                    this.filePreview = file;
+                },
+
+                addXP(amount, type = 'general') {
+                    if (!this.currentUser) return;
+                    
+                    // Check daily limits
+                    const today = new Date().toDateString();
+                    const dailyXP = this.currentUser.dailyXP || {};
+                    if (!dailyXP[today]) dailyXP[today] = 0;
+                    
+                    let xpGained = amount;
+                    
+                    // Apply daily limits
+                    if (type === 'chat_message' && dailyXP[today] >= 50) {
+                        xpGained = 0; // Max 50 XP per day from chat
+                    } else if (type === 'thread_created' && dailyXP[today] >= 100) {
+                        xpGained = 5; // Reduced XP after daily limit
+                    } else if (type === 'time_on_site' && dailyXP[today] >= 20) {
+                        xpGained = 0; // Max 20 XP per day from time on site
+                    }
+                    
+                    if (xpGained > 0) {
+                        this.currentUser.xp += xpGained;
+                        dailyXP[today] += xpGained;
+                        this.currentUser.dailyXP = dailyXP;
+                    }
+                    
+                    // Calculate level
+                    const xp = this.currentUser.xp;
+                    let level = 1;
+                    if (xp >= 15000) level = 15;
+                    else if (xp >= 12000) level = 14;
+                    else if (xp >= 10000) level = 13;
+                    else if (xp >= 8500) level = 12;
+                    else if (xp >= 7000) level = 11;
+                    else if (xp >= 5500) level = 10;
+                    else if (xp >= 4200) level = 9;
+                    else if (xp >= 3100) level = 8;
+                    else if (xp >= 2200) level = 7;
+                    else if (xp >= 1450) level = 6;
+                    else if (xp >= 900) level = 5;
+                    else if (xp >= 500) level = 4;
+                    else if (xp >= 200) level = 3;
+                    else if (xp >= 50) level = 2;
+                    
+                    this.currentUser.level = level;
+                    
+                    // Update users array
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === this.currentUser.id);
+                    if (userIndex !== -1) {
+                        users[userIndex].xp = this.currentUser.xp;
+                        users[userIndex].level = this.currentUser.level;
+                        users[userIndex].dailyXP = this.currentUser.dailyXP;
+                        localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                    }
+                    
+                    localStorage.setItem('valandwaffen_user', JSON.stringify(this.currentUser));
+                },
+
+                viewThread(thread) {
+                    this.selectedThread = thread;
+                    this.currentView = 'thread';
+                },
+
+                formatDate(dateString) {
+                    const date = new Date(dateString);
+                    const now = new Date();
+                    const diff = Math.floor((now - date) / 1000);
+                    
+                    if (diff < 60) return 'just now';
+                    if (diff < 3600) return Math.floor(diff / 60) + ' minutes ago';
+                    if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+                    return Math.floor(diff / 86400) + ' days ago';
+                },
+
+                initializeSampleData() {
+                    // Create admin user
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const adminExists = users.find(u => u.email === 'northlable69@gmail.com');
+                    
+                    if (!adminExists) {
+                        const adminUser = {
+                            id: 1,
+                            username: 'skandal',
+                            email: 'northlable69@gmail.com',
+                            password: btoa('67north67' + 'salt'),
+                            role: 'Owner',
+                            badges: ['Owner'],
+                            xp: 0,
+                            level: 1,
+                            dailyXP: {},
+                            profilePicture: '',
+                            profileBanner: '',
+                            createdAt: new Date().toISOString()
+                        };
+                        users.push(adminUser);
+                        localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                    }
+
+                    // Add sample forum threads
+                    if (this.forumThreads.length === 0) {
+                        this.forumThreads = [
+                            {
+                                id: 1,
+                                title: 'Community Guidelines',
+                                content: 'Welcome to ValandWaffen. Please follow our community guidelines and maintain respect for all members.',
+                                author: 'skandal',
+                                replies: [],
+                                views: 45,
+                                createdAt: new Date(Date.now() - 86400000).toISOString()
+                            },
+                            {
+                                id: 2,
+                                title: 'General Discussion',
+                                content: 'This is a general discussion thread for community members to connect and share ideas.',
+                                author: 'skandal',
+                                replies: [],
+                                views: 23,
+                                createdAt: new Date(Date.now() - 172800000).toISOString()
+                            }
+                        ];
+                        this.saveData();
+                    }
+
+                    // Add sample chat messages
+                    if (this.chatMessages.length === 0) {
+                        this.chatMessages = [
+                            {
+                                id: 1,
+                                author: 'skandal',
+                                content: 'Welcome to the community chat.',
+                                timestamp: new Date(Date.now() - 3600000).toISOString()
+                            }
+                        ];
+                        this.saveData();
+                    }
+
+                    // Initialize friends data
+                    if (this.friends.length === 0) {
+                        this.friends = [];
+                        this.friendRequests = [];
+                        this.privateMessages = [];
+                        this.saveData();
+                    }
+                },
+
+                // Thread functions
+                postReply() {
+                    if (!this.newThreadReply.trim() && this.threadAttachments.length === 0) return;
+                    if (!this.selectedThread || this.selectedThread.locked) return;
+                    
+                    const reply = {
+                        id: Date.now(),
+                        author: this.currentUser.username,
+                        content: this.newThreadReply,
+                        timestamp: new Date().toISOString(),
+                        attachments: [...this.threadAttachments]
+                    };
+                    
+                    this.selectedThread.replies.push(reply);
+                    this.saveData();
+                    this.newThreadReply = '';
+                    this.threadAttachments = [];
+                    
+                    this.addXP(5, 'reply_posted');
+                },
+
+                deleteThread(thread) {
+                    if (confirm('Are you sure you want to delete this thread?')) {
+                        this.forumThreads = this.forumThreads.filter(t => t.id !== thread.id);
+                        this.saveData();
+                        this.currentView = 'forum';
+                    }
+                },
+
+                deleteThreadFromAdmin(thread) {
+                    if (confirm('Are you sure you want to delete this thread?')) {
+                        this.forumThreads = this.forumThreads.filter(t => t.id !== thread.id);
+                        this.saveData();
+                    }
+                },
+
+                deleteReply(thread, reply) {
+                    if (confirm('Are you sure you want to delete this reply?')) {
+                        thread.replies = thread.replies.filter(r => r.id !== reply.id);
+                        this.saveData();
+                    }
+                },
+
+                lockThread(thread) {
+                    thread.locked = !thread.locked;
+                    this.saveData();
+                    this.showNotification(thread.locked ? 'Thread locked' : 'Thread unlocked', 'info');
+                },
+
+                // Admin functions
+                saveAdminSettings() {
+                    this.saveData();
+                    this.showNotification('Admin settings saved', 'success');
+                },
+
+                banUser(user) {
+                    if (confirm(`Are you sure you want to ${this.bannedUsers.includes(user.id) ? 'unban' : 'ban'} ${user.username}?`)) {
+                        if (this.bannedUsers.includes(user.id)) {
+                            this.bannedUsers = this.bannedUsers.filter(id => id !== user.id);
+                            this.showNotification(`${user.username} unbanned`, 'success');
+                        } else {
+                            this.bannedUsers.push(user.id);
+                            this.showNotification(`${user.username} banned`, 'info');
+                        }
+                        this.saveData();
+                    }
+                },
+
+                deleteChatMessage(message) {
+                    if (confirm('Are you sure you want to delete this message?')) {
+                        this.chatMessages = this.chatMessages.filter(m => m.id !== message.id);
+                        this.saveData();
+                    }
+                },
+
+                isBanned() {
+                    return this.bannedUsers.includes(this.currentUser?.id);
+                },
+
+                canPostChat() {
+                    return !this.adminSettings.lockdownChat && !this.isBanned();
+                },
+
+                canPostThread() {
+                    return !this.adminSettings.lockdownThreads && !this.isBanned();
+                },
+
+                // Ticket visibility - only ticket creator and admins can see
+                getVisibleTickets() {
+                    if (!this.isAuthenticated) return [];
+                    if (this.currentUser.role === 'Admin' || this.currentUser.role === 'Owner') return this.userTickets;
+                    return this.userTickets.filter(ticket => ticket.createdBy === this.currentUser.username);
+                },
+
+                // File upload handlers
+                handleProfilePictureUpload(event) {
+                    const file = event.target.files[0];
+                    console.log('Profile picture file selected:', file);
+                    console.log('File type:', file.type);
+                    console.log('File name:', file.name);
+                    
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            console.log('FileReader loaded, data length:', e.target.result.length);
+                            this.profileEditForm.profilePicture = e.target.result;
+                            console.log('Profile picture set in form');
+                        };
+                        reader.onerror = (error) => {
+                            console.error('FileReader error:', error);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        console.log('No file selected');
+                    }
+                },
+
+                handleProfileBannerUpload(event) {
+                    const file = event.target.files[0];
+                    console.log('Profile banner file selected:', file);
+                    console.log('File type:', file.type);
+                    console.log('File name:', file.name);
+                    
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            console.log('FileReader loaded for banner, data length:', e.target.result.length);
+                            this.profileEditForm.profileBanner = e.target.result;
+                            console.log('Profile banner set in form');
+                        };
+                        reader.onerror = (error) => {
+                            console.error('FileReader error for banner:', error);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        console.log('No file selected for banner');
+                    }
+                },
+
+                // Mini profile functions
+                showMiniProfile(username, event) {
+                    const user = this.allUsers.find(u => u.username === username);
+                    if (user) {
+                        this.miniProfileUser = user;
+                        this.miniProfilePosition = {
+                            x: event.pageX + 10,
+                            y: event.pageY + 10
+                        };
+                        this.showUserMiniProfile = true;
+                    }
+                },
+
+                hideMiniProfile() {
+                    setTimeout(() => {
+                        this.showUserMiniProfile = false;
+                    }, 200);
+                },
+
+                getUserProfilePicture(username) {
+                    const user = this.allUsers.find(u => u.username === username);
+                    return user ? user.profilePicture : null;
+                },
+
+                // Message system functions
+                getConversations() {
+                    const conversations = new Map();
+                    
+                    // Get all users who have sent/received messages with current user
+                    this.privateMessages.forEach(message => {
+                        const otherUserId = message.from === this.currentUser.id ? message.to : message.from;
+                        const otherUser = this.allUsers.find(u => u.id === otherUserId);
+                        
+                        if (otherUser) {
+                            if (!conversations.has(otherUserId)) {
+                                conversations.set(otherUserId, {
+                                    id: otherUserId,
+                                    username: otherUser.username,
+                                    profilePicture: otherUser.profilePicture,
+                                    level: otherUser.level,
+                                    lastMessage: '',
+                                    lastMessageTime: ''
+                                });
+                            }
+                            
+                            const conv = conversations.get(otherUserId);
+                            if (!conv.lastMessageTime || new Date(message.timestamp) > new Date(conv.lastMessageTime)) {
+                                conv.lastMessage = message.content;
+                                conv.lastMessageTime = message.timestamp;
+                            }
+                        }
+                    });
+
+                    return Array.from(conversations.values()).sort((a, b) => 
+                        new Date(b.lastMessageTime) - new Date(a.lastMessageTime)
+                    );
+                },
+
+                openConversation(conversation) {
+                    this.selectedConversation = conversation;
+                    this.newMessage = '';
+                },
+
+                getConversationMessages(userId) {
+                    const messages = this.privateMessages.filter(msg => 
+                        (msg.from === this.currentUser.id && msg.to === userId) ||
+                        (msg.from === userId && msg.to === this.currentUser.id)
+                    ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+                    // Add profile pictures to messages
+                    return messages.map(message => {
+                        const fromUser = this.allUsers.find(u => u.id === message.from);
+                        return {
+                            ...message,
+                            fromProfilePicture: fromUser?.profilePicture || null
+                        };
+                    });
+                },
+
+                sendMessage() {
+                    if (!this.newMessage.trim() || !this.selectedConversation) return;
+
+                    const message = {
+                        id: Date.now(),
+                        from: this.currentUser.id,
+                        to: this.selectedConversation.id,
+                        content: this.newMessage,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    this.privateMessages.push(message);
+                    this.saveData();
+                    this.newMessage = '';
+                },
+
+                deleteMessage(message) {
+                    if (confirm('Delete this message?')) {
+                        this.privateMessages = this.privateMessages.filter(m => m.id !== message.id);
+                        this.saveData();
+                    }
+                },
+
+                viewUserProfileFromMiniProfile(username) {
+                    const user = this.allUsers.find(u => u.username === username);
+                    if (user) {
+                        this.viewedUser = user;
+                        this.currentView = 'userProfile';
+                    }
+                },
+
+                isCurrentUser(user) {
+                    return user.id === this.currentUser.id;
+                },
+
+                openConversationFromProfile(user) {
+                    const conversation = {
+                        id: user.id,
+                        username: user.username,
+                        profilePicture: user.profilePicture,
+                        level: user.level
+                    };
+                    this.selectedConversation = conversation;
+                    this.currentView = 'messages';
+                },
+
+                // Friend system functions
+                searchUsers() {
+                    if (!this.userSearchQuery.trim()) {
+                        this.searchedUsers = [];
+                        return;
+                    }
+                    
+                    this.searchedUsers = this.allUsers.filter(user => 
+                        user.username.toLowerCase().includes(this.userSearchQuery.toLowerCase()) &&
+                        user.id !== this.currentUser.id
+                    );
+                },
+
+                isFriend(user) {
+                    return this.friends.some(friend => friend.id === user.id);
+                },
+
+                hasSentRequest(user) {
+                    return this.friendRequests.some(request => 
+                        request.from.id === this.currentUser.id && request.to.id === user.id
+                    );
+                },
+
+                // Notification system
+                showNotification(message, type = 'info') {
+                    const notification = {
+                        id: Date.now(),
+                        message: message,
+                        type: type
+                    };
+                    
+                    this.notifications.push(notification);
+                    
+                    // Auto-remove after 3 seconds
+                    setTimeout(() => {
+                        this.notifications = this.notifications.filter(n => n.id !== notification.id);
+                    }, 3000);
+                },
+
+                sendFriendRequest(user) {
+                    const request = {
+                        id: Date.now(),
+                        from: this.currentUser,
+                        to: user,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    this.friendRequests.push(request);
+                    this.saveData();
+                    this.showNotification(`Friend request sent to ${user.username}`, 'success');
+                },
+
+                acceptFriendRequest(request) {
+                    // Add to friends list
+                    if (!this.friends.some(friend => friend.id === request.from.id)) {
+                        this.friends.push(request.from);
+                    }
+                    
+                    // Remove from requests
+                    this.friendRequests = this.friendRequests.filter(r => r.id !== request.id);
+                    this.saveData();
+                    this.showNotification(`You are now friends with ${request.from.username}`, 'success');
+                },
+
+                declineFriendRequest(request) {
+                    this.friendRequests = this.friendRequests.filter(r => r.id !== request.id);
+                    this.saveData();
+                    this.showNotification('Friend request declined', 'info');
+                },
+
+                removeFriend(friend) {
+                    this.friends = this.friends.filter(f => f.id !== friend.id);
+                    this.saveData();
+                    this.showNotification(`${friend.username} removed from friends`, 'info');
+                },
+
+                // Private chat functions
+                openPrivateChat(user) {
+                    this.privateChatUser = user;
+                    this.showPrivateChat = true;
+                    this.newPrivateMessage = '';
+                },
+
+                getPrivateMessages(userId) {
+                    return this.privateMessages.filter(msg => 
+                        (msg.from === this.currentUser.id && msg.to === userId) ||
+                        (msg.from === userId && msg.to === this.currentUser.id)
+                    ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                },
+
+                sendPrivateMessage() {
+                    if (!this.newPrivateMessage.trim() || !this.privateChatUser) return;
+
+                    const message = {
+                        id: Date.now(),
+                        from: this.currentUser.id,
+                        to: this.privateChatUser.id,
+                        content: this.newPrivateMessage,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    this.privateMessages.push(message);
+                    this.saveData();
+                    this.newPrivateMessage = '';
+                },
+            }
+        }
+    </script>
+</body>
+</html>
