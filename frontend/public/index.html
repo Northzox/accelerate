@@ -581,9 +581,9 @@
 
             <div class="space-y-4">
                 <template x-for="thread in forumThreads" :key="thread.id">
-                    <div class="card-dark hover:bg-gray-900 cursor-pointer transition-all" @click="viewThread(thread)">
+                    <div class="card-dark hover:bg-gray-900 transition-all">
                         <div class="flex justify-between items-start">
-                            <div class="flex-1">
+                            <div class="flex-1 cursor-pointer" @click="viewThread(thread)">
                                 <h3 class="text-lg font-semibold text-white mb-2" x-text="thread.title"></h3>
                                 <p class="text-gray-400 text-sm mb-3" x-text="thread.content.substring(0, 200) + '...'"></p>
                                 <div class="flex items-center space-x-6 text-xs text-gray-500">
@@ -602,8 +602,23 @@
                                     <span>Replies: <span x-text="thread.replies.length"></span></span>
                                     <span>Views: <span x-text="thread.views"></span></span>
                                     <span x-text="formatDate(thread.createdAt)"></span>
+                                    <span x-show="thread.locked" class="text-red-400 font-semibold">🔒 LOCKED</span>
                                 </div>
                             </div>
+                            <!-- Admin Quick Actions -->
+                            <template x-if="isAuthenticated && (currentUser.role === 'Admin' || currentUser.role === 'Owner')">
+                                <div class="flex space-x-2 ml-4">
+                                    <button @click.stop="quickLockThread(thread)" 
+                                            class="text-xs px-2 py-1 rounded"
+                                            :class="thread.locked ? 'bg-yellow-600 hover:bg-yellow-700 text-white' : 'bg-gray-600 hover:bg-gray-700 text-white'"
+                                            x-text="thread.locked ? 'Unlock' : 'Lock'">
+                                    </button>
+                                    <button @click.stop="quickDeleteThread(thread)" 
+                                            class="text-xs px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded">
+                                        Delete
+                                    </button>
+                                </div>
+                            </template>
                         </div>
                     </div>
                 </template>
@@ -1475,6 +1490,42 @@
                         </div>
                     </div>
 
+                    <!-- XP Management -->
+                    <div>
+                        <h3 class="text-lg font-semibold text-white mb-4">XP Management</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Select User</label>
+                                <select x-model="selectedUserForXP" class="input-dark">
+                                    <option value="">Choose user...</option>
+                                    <template x-for="user in allUsers" :key="user.id">
+                                        <option :value="user.id" x-text="`${user.username} (Level ${user.level}, ${user.xp} XP)`"></option>
+                                    </template>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-1">XP Amount</label>
+                                    <input x-model="xpAmount" type="number" min="0" class="input-dark" placeholder="Enter XP">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-1">Reason</label>
+                                    <input x-model="xpReason" type="text" class="input-dark" placeholder="Reason for XP">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button @click="giveXP" class="btn-primary-dark text-sm">Give XP</button>
+                                <button @click="removeXP" class="btn-dark text-sm">Remove XP</button>
+                                <button @click="setXP" class="btn-dark text-sm">Set XP</button>
+                            </div>
+                            <div class="text-xs text-gray-400">
+                                <p>• Give XP: Adds XP to user</p>
+                                <p>• Remove XP: Subtracts XP from user</p>
+                                <p>• Set XP: Sets exact XP amount</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- User Management -->
                     <div>
                         <h3 class="text-lg font-semibold text-white mb-4">User Management</h3>
@@ -1807,6 +1858,9 @@
                 showUserMenu: false,
                 showSignupModal: false,
                 selectedUserForBadge: '',
+                selectedUserForXP: '',
+                xpAmount: '',
+                xpReason: '',
                 loginForm: { email: '', password: '' },
                 signupForm: { username: '', email: '', password: '' },
                 newThread: { title: '', content: '' },
@@ -2359,6 +2413,46 @@
                     this.currentView = 'thread';
                 },
 
+                // Quick Thread Actions for Admins
+                quickLockThread(thread) {
+                    if (!this.isAuthenticated || (this.currentUser.role !== 'Admin' && this.currentUser.role !== 'Owner')) {
+                        this.showNotification('Admin access required', 'error');
+                        return;
+                    }
+                    
+                    const threadIndex = this.forumThreads.findIndex(t => t.id === thread.id);
+                    if (threadIndex !== -1) {
+                        this.forumThreads[threadIndex].locked = !this.forumThreads[threadIndex].locked;
+                        this.saveData();
+                        
+                        const action = this.forumThreads[threadIndex].locked ? 'locked' : 'unlocked';
+                        this.showNotification(`Thread "${thread.title}" ${action}`, 'success');
+                        
+                        // Create notification for thread author
+                        this.createNotification(thread.author, `Your thread "${thread.title}" was ${action} by admin`, 'thread_moderation');
+                    }
+                },
+
+                quickDeleteThread(thread) {
+                    if (!this.isAuthenticated || (this.currentUser.role !== 'Admin' && this.currentUser.role !== 'Owner')) {
+                        this.showNotification('Admin access required', 'error');
+                        return;
+                    }
+                    
+                    if (confirm(`Are you sure you want to delete "${thread.title}"? This action cannot be undone.`)) {
+                        const threadIndex = this.forumThreads.findIndex(t => t.id === thread.id);
+                        if (threadIndex !== -1) {
+                            this.forumThreads.splice(threadIndex, 1);
+                            this.saveData();
+                            
+                            this.showNotification(`Thread "${thread.title}" deleted`, 'success');
+                            
+                            // Create notification for thread author
+                            this.createNotification(thread.author, `Your thread "${thread.title}" was deleted by admin`, 'thread_moderation');
+                        }
+                    }
+                },
+
                 formatDate(dateString) {
                     const date = new Date(dateString);
                     const now = new Date();
@@ -2577,6 +2671,97 @@
                         reader.readAsDataURL(file);
                     } else {
                         console.log('No file selected for banner');
+                    }
+                },
+
+                // XP Management Functions
+                giveXP() {
+                    if (!this.selectedUserForXP || !this.xpAmount) {
+                        this.showNotification('Please select user and enter XP amount', 'error');
+                        return;
+                    }
+                    
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === parseInt(this.selectedUserForXP));
+                    
+                    if (userIndex !== -1) {
+                        const user = users[userIndex];
+                        const oldLevel = user.level;
+                        user.xp += parseInt(this.xpAmount);
+                        user.level = Math.floor(user.xp / 100) + 1;
+                        
+                        localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                        this.allUsers = users;
+                        
+                        const levelUp = user.level > oldLevel ? ` (LEVEL UP!)` : '';
+                        this.showNotification(`Gave ${this.xpAmount} XP to ${user.username}${levelUp}`, 'success');
+                        
+                        if (this.xpReason) {
+                            this.createNotification(user.username, `Received ${this.xpAmount} XP: ${this.xpReason}`, 'xp_gain');
+                        }
+                        
+                        this.xpAmount = '';
+                        this.xpReason = '';
+                    }
+                },
+
+                removeXP() {
+                    if (!this.selectedUserForXP || !this.xpAmount) {
+                        this.showNotification('Please select user and enter XP amount', 'error');
+                        return;
+                    }
+                    
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === parseInt(this.selectedUserForXP));
+                    
+                    if (userIndex !== -1) {
+                        const user = users[userIndex];
+                        const oldLevel = user.level;
+                        user.xp = Math.max(0, user.xp - parseInt(this.xpAmount));
+                        user.level = Math.floor(user.xp / 100) + 1;
+                        
+                        localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                        this.allUsers = users;
+                        
+                        const levelDown = user.level < oldLevel ? ` (LEVEL DOWN!)` : '';
+                        this.showNotification(`Removed ${this.xpAmount} XP from ${user.username}${levelDown}`, 'success');
+                        
+                        if (this.xpReason) {
+                            this.createNotification(user.username, `Lost ${this.xpAmount} XP: ${this.xpReason}`, 'xp_loss');
+                        }
+                        
+                        this.xpAmount = '';
+                        this.xpReason = '';
+                    }
+                },
+
+                setXP() {
+                    if (!this.selectedUserForXP || this.xpAmount === '') {
+                        this.showNotification('Please select user and enter XP amount', 'error');
+                        return;
+                    }
+                    
+                    const users = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === parseInt(this.selectedUserForXP));
+                    
+                    if (userIndex !== -1) {
+                        const user = users[userIndex];
+                        const oldLevel = user.level;
+                        user.xp = parseInt(this.xpAmount);
+                        user.level = Math.floor(user.xp / 100) + 1;
+                        
+                        localStorage.setItem('valandwaffen_users', JSON.stringify(users));
+                        this.allUsers = users;
+                        
+                        const levelChange = user.level !== oldLevel ? ` (Level changed to ${user.level}!)` : '';
+                        this.showNotification(`Set ${user.username}'s XP to ${this.xpAmount}${levelChange}`, 'success');
+                        
+                        if (this.xpReason) {
+                            this.createNotification(user.username, `XP set to ${this.xpAmount}: ${this.xpReason}`, 'xp_change');
+                        }
+                        
+                        this.xpAmount = '';
+                        this.xpReason = '';
                     }
                 },
 
