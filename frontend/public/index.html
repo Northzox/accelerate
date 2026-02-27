@@ -1945,31 +1945,25 @@
 
                 async loadData() {
                     try {
-                        // Load data from API instead of localStorage
-                        const data = await window.apiService.getAllData();
+                        // Temporarily use localStorage while API is being fixed
+                        this.loadLocalData();
                         
-                        this.forumThreads = data.forumThreads || [];
-                        this.chatMessages = data.chatMessages || [];
-                        this.userTickets = data.userTickets || [];
-                        this.friends = data.friends || [];
-                        this.friendRequests = data.friendRequests || [];
-                        this.privateMessages = data.privateMessages || [];
-                        this.adminSettings = data.adminSettings || {
-                            chatCooldown: 0,
-                            threadCooldown: 0,
-                            lockdownChat: false,
-                            lockdownThreads: false
-                        };
-                        this.bannedUsers = data.bannedUsers || [];
-                        
-                        // Load all users for admin panel
-                        this.allUsers = data.users || [];
+                        // Try API but don't fail if it doesn't work
+                        try {
+                            const data = await window.apiService.getAllData();
+                            this.forumThreads = data.forumThreads || [];
+                            this.chatMessages = data.chatMessages || [];
+                            this.userTickets = data.userTickets || [];
+                            this.allUsers = data.users || [];
+                            this.adminSettings = data.adminSettings || this.adminSettings;
+                        } catch (apiError) {
+                            console.log('API not available yet, using localStorage');
+                        }
                         
                         // Set up auto-refresh for real-time updates
                         this.setupAutoRefresh();
                     } catch (error) {
-                        console.error('Failed to load data from API:', error);
-                        // Fallback to localStorage if API fails
+                        console.error('Failed to load data:', error);
                         this.loadLocalData();
                     }
                 },
