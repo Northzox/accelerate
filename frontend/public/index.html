@@ -12,6 +12,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="icons/main.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icons/main.png">
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <script src="api.js"></script>
     <style>
         [x-cloak] { display: none !important; }
         
@@ -1942,7 +1943,38 @@
                     }, 60000); // 1 XP per minute
                 },
 
-                loadData() {
+                async loadData() {
+                    try {
+                        // Load data from API instead of localStorage
+                        const data = await window.apiService.getAllData();
+                        
+                        this.forumThreads = data.forumThreads || [];
+                        this.chatMessages = data.chatMessages || [];
+                        this.userTickets = data.userTickets || [];
+                        this.friends = data.friends || [];
+                        this.friendRequests = data.friendRequests || [];
+                        this.privateMessages = data.privateMessages || [];
+                        this.adminSettings = data.adminSettings || {
+                            chatCooldown: 0,
+                            threadCooldown: 0,
+                            lockdownChat: false,
+                            lockdownThreads: false
+                        };
+                        this.bannedUsers = data.bannedUsers || [];
+                        
+                        // Load all users for admin panel
+                        this.allUsers = data.users || [];
+                        
+                        // Set up auto-refresh for real-time updates
+                        this.setupAutoRefresh();
+                    } catch (error) {
+                        console.error('Failed to load data from API:', error);
+                        // Fallback to localStorage if API fails
+                        this.loadLocalData();
+                    }
+                },
+
+                loadLocalData() {
                     const savedData = localStorage.getItem('valandwaffen_data');
                     if (savedData) {
                         const data = JSON.parse(savedData);
@@ -1965,7 +1997,36 @@
                     this.allUsers = JSON.parse(localStorage.getItem('valandwaffen_users') || '[]');
                 },
 
-                saveData() {
+                setupAutoRefresh() {
+                    // Refresh data every 30 seconds for real-time updates
+                    setInterval(async () => {
+                        if (this.isAuthenticated) {
+                            try {
+                                const data = await window.apiService.getAllData();
+                                this.forumThreads = data.forumThreads || [];
+                                this.chatMessages = data.chatMessages || [];
+                                this.userTickets = data.userTickets || [];
+                                this.allUsers = data.users || [];
+                                this.adminSettings = data.adminSettings || this.adminSettings;
+                            } catch (error) {
+                                console.error('Auto-refresh failed:', error);
+                            }
+                        }
+                    }, 30000);
+                },
+
+                async saveData() {
+                    try {
+                        // Save to API instead of localStorage
+                        await window.apiService.updateAdminSettings(this.adminSettings);
+                    } catch (error) {
+                        console.error('Failed to save data to API:', error);
+                        // Fallback to localStorage if API fails
+                        this.saveLocalData();
+                    }
+                },
+
+                saveLocalData() {
                     const data = {
                         forumThreads: this.forumThreads,
                         chatMessages: this.chatMessages,

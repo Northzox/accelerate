@@ -4,9 +4,17 @@
     {
       "src": "frontend/public/index.html",
       "use": "@vercel/static"
+    },
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
     }
   ],
   "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
     {
       "src": "/",
       "dest": "/frontend/public/index.html"
@@ -15,5 +23,10 @@
       "src": "/(.*)",
       "dest": "/frontend/public/$1"
     }
-  ]
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 30
+    }
+  }
 }
