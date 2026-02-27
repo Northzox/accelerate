@@ -2632,7 +2632,7 @@
                 // Ticket visibility - only ticket creator and admins can see
                 getVisibleTickets() {
                     if (!this.isAuthenticated) return [];
-                    if (this.currentUser.role === 'Admin' || this.currentUser.role === 'Owner') return this.userTickets;
+                    if (this.currentUser.role === 'Admin' || this.currentUser.role === 'Owner' || this.currentUser.role === 'Staff') return this.userTickets;
                     return this.userTickets.filter(ticket => ticket.createdBy === this.currentUser.username);
                 },
 
